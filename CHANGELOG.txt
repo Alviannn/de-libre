@@ -1,0 +1,175 @@
+20/12/2020 (1):
+
+Perubahan pada `utils.c` lebih tepatnya pada function `await_enter` dan `scan_number`.
+
+- **await_enter**
+Diganti cara menerima ENTER key dari user (sekarang lebih efisien karena tidak menggunakan `while` syntax lagi)
+
+- **scan_number**
+Sekarang sudah bisa menggunakan `scan_number(NULL);` dan default messagenya jika parameternya `NULL` adalah ">> "
+Contoh:
+```c
+int num = scan_number(NULL);
+printf("Angka yang dimasukkan adalah %d!\n", num);
+```
+Output:
+```
+>> 23
+Angka yang dimasukkan adalah 23!```
+
+-----------------------------------------------------------------------
+
+20/12/2020 (2):
+
+Perubahan pada `common.c`
+
+- **user_t** structure dan **book_t** structure
+Terdapat tambahan berupa attribut/properti prev dan next.
+Ini diperlukan untuk data structure yang akan digunakan pada aplikasi,
+yaitu doubly linked list.
+
+- **userhead**, **usertail**, **bookhead**, **booktail**
+Ini diperlukan untuk data structure yang akan digunakan pada aplikasi,
+yaitu doubly linked list.
+Guna untuk mengetahui awalan dari sebuah linked list dan akhiran pada linked list
+
+- **book_sort** enum dan **sort_type** enum
+Untuk mempermudah pengurutan buku kita dapat menggunakan tipe sortingan pada `book_sort` (contoh: `ID_SORT`).
+Kemudian `sort_type` yaitu untuk mengetahui apakah sortingannya keatas atau kebawah.
+Hal-hal ini ditambahkan untuk mempermudah pembacaan program.
+
+- **show_books** function
+Kita bisa menggunakan ini dibagian mana pun untuk melihat buku-buku yang ada.
+
+-----------------------------------------------------------------------
+
+25/12/2020 (1):
+
+- Penggunaan **header** files
+Agar C compilernya tau mana yang harus di import dan mana yang tidak.
+Jadi kurang lebih seperti tulang belakangnya atau templatenya para file `.c`.
+Cara import yang baru adalah menggunakan `#include "common.h"`
+
+- Perubahan penggunaan data struktur
+Sebelumnya kita sudah memilih untuk menggunakan _Doubly Linked List_ untuk menampung data-data seperti buku dan user.
+Tetapi, pada kali ini kita menggantikan cara penampungan tersebut dengan menggunakan array saja.
+Yaitu variable berupa `USER_LIST` dan `BOOK_LIST` untuk arraynya, dan `ULIST_LENGTH` dan `BLIST_LENGTH` sebagai penanda
+panjang atau besar tampungan array-array tersebut.
+
+Hal ini dilakukan karena untuk mempermudah pembuatan _sorting_ dan _searching_.
+
+- **show_books** function (pada file `common`)
+Function ini yang pada awalnya tidak terlalu berisi sudah terselesaikan walaupun tidak sepenuhnya selesai karena
+tidak terdapat _sorting_ dan mungkin fitur untuk sekalian menunjukkan buku-buku yang telah dipinjam si user.
+Kemudian pada function ini juga sudah terdapat proses pagination atau proses dimana kita bisa membagi-bagi array buku menjadi sebuah halaman.
+Intinya untuk sementara sudah berfungsi untuk menunjukkan buku-buku.
+
+- Penyediaan function **findbook** dan **finduser**
+Hanya sekedar disediakan dan tidak terlalu berfungsi.
+@hexagon#3168 tambahin metode searching dibagian ini :v
+
+- File **Makefile**
+File ini akan digunakan untuk nge-compile project kita menjadi satu `.exe`.
+Karena sebelumnya kita menggunakan _include_ yang merujuk pada file `.c`-nya langsung kita tidak memerlukan ini.
+Tetapi, karena sekarang langsung menggunakan _header_ file yang telah disediakan kita diharuskan menggunakan **Makefile** ini.
+
+Untuk pengguna `DevC++` dan `CodeBlocks` kalian seharusnya tidak akan terjadi perubahan cara compile karena programnya sudah menyediakan fitur tersebut, 
+tetapi untuk pengguna `Visual Studio Code` atau `vscode` akan memerlukan perubahan cara.
+
+Cara penggunaan:
+1. Buka terminal
+2. Ketik `make` dan enter
+
+NOTE: Untuk pengguna Windows yang bermasalah saat menggunakan **Makefile** harap kontak @Alvian#1341
+
+- File **CHANGELOG.txt**
+Ini untuk menunjukkan perubahan-perubahan global pada projek, seperti yang sudah disampaikan sebelum-sebelumnya.
+
+BAGI YANG TERKENA MASALAH KARENA UPDATE BARU INI HARAP LANGSUNG KONTAK @Alvian#1341!
+DAN BAGI YANG SUDAH MENYELESAIKAN TUGAS CODINGNYA, TIDAK PERLU UNTUK MENGUPDATE CODENYA!
+
+Jika tidak mau mengupdate code karena bingung atau takut bermasalah code yang sudah dibuatnya, ya gpp sih.
+
+-----------------------------------------------------------------------
+
+26/12/2020 (1):
+
+Perubahan pada file `common.c` dan `common.h`
+
+- Function **findbook** dan **finduser**
+Pergantian hasil return function dari object/instance yang diinginkan menjadi
+index menuju ke object/instance tersebut.
+
+Thanks to @hexagon#3168 metode binary search untuk mendapatkan object/instance yang diinginkan sudah selesai.
+Tetapi, sorting untuk binary search-nya belum :'v
+
+-----------------------------------------------------------------------
+
+28/12/2020 (1):
+
+- **Quick sort method**
+Sudah direvisi agar bisa menggunakan quicksort ini pada semua macam tipe data sekaligus.
+Thank you @hexagon#3168 untuk quick sortnya :v
+
+- **Global variable**
+Variable-variable global yang tersedia pada `common.h` atau `common.c` sudah dirubah.
+Seperti `USER_LIST` dan `BOOK_LIST` yg sebelumnya berupa "array of pointer struct" menjadi "array of struct" untuk mempermudah penggunaan.
+`ULIST_LENGTH` dan `BLIST_LENGTH` sudah disingkat menjadi `ULENGTH` dan `BLENGTH`.
+
+- **Function comparator**
+Pada file yg berawal `common` sekarang sudah terdapat function pembanding (untuk struct book-nya).
+
+- **Common functions**
+Beberapa function pada file yg berawal `common` sudah diperbaiki dan ditambah.
+Function `findbook` dan `finduser` sekarang sudah terdapat penggunaan quicksort (karena binary search perlu di sort terlebih dahulu).
+Function `show_books` dihapus (lebih tepatnya dicomment) dan terdapat pengganti berupa `book_paginate` yang dapat digunakan untuk membuat
+halaman pada suatu elemen-elemen, sebagai contoh total buku ada 30 dan kita ingin menjadikan halaman masing2 10 elemen.
+Function `createuser` dan `createbook` direvisi menjadi non pointer (bukan struct pointer lagi) agar dapat menggunakan function `quicksort` yang telah disediakan.
+Function `isbook_borrowed` untuk menentukan apakah buku tersebut sedang dalam pinjaman atau tidak.
+
+EXTRA:
+Bagi yang masih bingung bagaimana cara mendapatkan elemen2 pada array user atau buku.
+Sebagai contoh untuk mendapatkan elemen pada index ke 2 pada user array, kita dapat menggunakan `user_t elem = USER_LIST[2];` untuk mendapatkan elemen tersebut.
+
+-----------------------------------------------------------------------
+
+28/12/2020 (2):
+
+- **book_paginate function**
+Terjadi kesalahan sedikit pada function ini dimana proses pagination mulai crash pada pemanggilan function kedua kalinya.
+Diperkirakan terjadi seperti ini karena _memory allocation_ yang dilakukan sebelumnya tidak dijalankan dengan baik.
+
+-----------------------------------------------------------------------
+
+29/12/2020 (1):
+
+- Function **createuser** dan **createbook**
+Kedua function ini sekarang sudah secara otomatis juga menambahkan _instance_ yang terbuat pada function ini ke dalam array masing2 (seperti user array dan book array)
+
+- Function **book_paginate**
+Terdapat perbaikan sedikit untuk proses sortingnya.
+Sebelumnya sorting dilakukan pada array yang terbagi, tetapi hal ini menghasilkan sortingan yang kurang sesuai karena semuanya tidak di sort.
+
+- Macro **MAXNAME_LENGTH**
+Maksimum panjang semua string yang terdapat pada struct di `common.h` dirubah dari 129 menjadi 40.
+Hal ini dilakukan agar string yang dimasukkan tidak terlalu panjang, kemudian hal ini juga sudah berlaku pada judul buku (sebelumnya mengikuti max file dari stdio yaitu 260)
+
+-----------------------------------------------------------------------
+
+29/12/2020 (2):
+
+- Struct **book_t** dan **user_t**
+Pada struct `book_t` ditambah atribut `time_t btime` yang akan digunakan sebagai kapan buku tersebut mulai dipinjam.
+Pada struct `User_t` ditambah atribut `int book_ids[MAX_BORROW]` dan `int book_count` (MAX_BORROW berupa macro yang terdefinisi pada `common.h`),
+atribut2 tersebut digunakan untuk mengetahui buku apa saja yang telah dipinjam oleh user.
+
+- Function **createbook** dan **createuser**
+Untuk memenuhi pembuatan struct `book_t` karena terdapat atribut baru maka parameter ini ditambahkan lagi, yaitu `time_t btime`.
+Begitu pula untuk pembuatan struct `user_t`.
+
+- Function **book_paginate**
+Tidak menggunakan _memory allocation_ lagi karena sudah optimalkan. Artinya kita tidak perlu menggunakan `free` function terhadap hasil dari ini function.
+
+- Tipedata **int** menjadi **unsigned**
+Pada `common.h` dan `common.c` terdapat perubahan berupa tipedata `int` menjadi `unsigned` atau `unsigned int` lebih tepatnya.
+Hal ini karena `unsigned int` tidak menerima angka negatif dan hanya menerima positif, contohnya seperti id buku kan tidak mungkin negatif nilainya
