@@ -2,7 +2,7 @@
 #include "menu/user.h"
 
 void insertbooks() {
-    FILE* file = fopen("books.txt", "r");
+    FILE* file = fopen("test/books.txt", "r");
 
     int id, pages;
     char title[101], author[101], borrower[101];
@@ -11,7 +11,7 @@ void insertbooks() {
         fscanf(file, "%d, %[^,], %[^,], %d, %[^\n]", &id, title, author, &pages, borrower);
         fgetc(file);
 
-        createbook(id, title, author, pages, borrower, 0);
+        createbook(id, title, author, pages, borrower, WEEK_IN_SECONDS);
     }
 
     fclose(file);

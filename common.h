@@ -28,6 +28,8 @@
 #define ELEMENTS_PER_PAGE 10
 /** The maximum borrowed books per user */
 #define MAX_BORROW 10
+/** The seconds for 7 days or 1 week */
+#define WEEK_IN_SECONDS (((60 * 60) * 24) * 7)
 
 // -                                                   - //
 // ---------------------- Structs ---------------------- //

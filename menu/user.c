@@ -53,6 +53,7 @@ void __do_borrow(book_t* book) {
 
     if (answer == 'Y') {
         strcpy(book->borrower, CURRENT_USER->name);
+        book->btime = time(NULL) + WEEK_IN_SECONDS;
 
         CURRENT_USER->book_ids[CURRENT_USER->book_count] = book->id;
         CURRENT_USER->book_count++;
@@ -146,7 +147,7 @@ void __borrow_books(book_sort name, sort_type type) {
             "2. Urutkan buku\n"
             "3. Halaman selanjutnya\n"
             "4. Halaman sebelumnya\n"
-            "5. Kembali\n");
+            "0. Kembali\n");
 
         bool isvalid = true;
         do {
@@ -199,12 +200,10 @@ void __borrow_books(book_sort name, sort_type type) {
                 case 4:
                     page--;
                     break;
-                case 5:
+                case 0:
                     return;
                 default:
                     printf("Pilihan tidak dapat ditemukan!\n");
-                    await_enter();
-
                     isvalid = false;
                     break;
             }
@@ -214,15 +213,16 @@ void __borrow_books(book_sort name, sort_type type) {
 
 /**
  * @brief Shows the user's borrowed books
+ * 
+ * @return true if the function successfully executed, false is otherwise
  */
-void __show_borrowed_books() {
+bool __show_borrowed_books() {
     clearscreen();
 
     int total = CURRENT_USER->book_count;
     if (total == 0) {
         printf("Anda sedang tidak meminjam buku apapun!\n");
-        await_enter();
-        return;
+        return false;
     }
 
     char LINE[] = "----------------------------------------------------------------------------------------------------------\n";
@@ -245,6 +245,106 @@ void __show_borrowed_books() {
     }
 
     printf(LINE);
+    return true;
+}
+
+void __return_borrowed_books() {
+    book_t* target = NULL;
+    // the index on user instance
+    int uidx = -1;
+    int bookcount = CURRENT_USER->book_count;
+
+    do {
+        clearscreen();
+
+        bool res = __show_borrowed_books();
+        if (!res) {
+            await_enter();
+            return;
+        }
+
+        printf("\nPengembalian buku...\n");
+
+        int id = scan_number("Masukkan ID buku: ");
+        uidx = -1;
+
+        if (id > 0) {
+            // does linear search
+            // because 10 is the max amount, so no worries
+            for (int i = 0; i < bookcount; i++) {
+                unsigned tmpid = CURRENT_USER->book_ids[i];
+
+                if ((unsigned)id == tmpid) {
+                    uidx = i;
+                    break;
+                }
+            }
+        }
+
+        if (uidx == -1) {
+            printf("Tidak dapat menemukan ID buku yang sedang dipinjam!\n");
+            await_enter();
+            continue;
+        }
+
+        int idx = findbook(id);
+        // incase when the selected book is not in the db but the user has it
+        // we must remove the book id from the user's instance here
+        if (idx == -1) {
+            int start = uidx;
+            unsigned* bookids = CURRENT_USER->book_ids;
+
+            if (uidx + 1 == bookcount) {
+                bookids[start] = 0;
+            } else {
+                memcpy((bookids + start), (bookids + start + 1), sizeof(int) * (bookcount - start - 1));
+                bookids[bookcount - 1] = 0;
+            }
+            
+            printf("Buku telah dikembalikan!\n");
+            await_enter();
+            return;
+        }
+
+        target = &BOOK_LIST[idx];
+        break;
+    } while (true);
+
+    printf(
+        "Apakah anda yakin ingin mengembalikan buku ini?\n"
+        "\n"
+        "(Y) Yes\n"
+        "(N) No\n");
+
+    char choice = 0;
+    do {
+        if (choice != 0)
+            printf("Pilihan tidak dapat ditemukan!\n");
+
+        printf(">> ");
+        choice = toupper(getchar());
+        fflush(stdin);
+    } while (choice != 'Y' && choice != 'N');
+
+    if (choice == 'Y') {
+        int start = uidx;
+        unsigned* bookids = CURRENT_USER->book_ids;
+
+        if (uidx + 1 == bookcount) {
+            bookids[start] = 0;
+        } else {
+            memcpy((bookids + start), (bookids + start + 1), sizeof(int) * (bookcount - start - 1));
+            bookids[bookcount - 1] = 0;
+        }
+
+        target->btime = 0;
+        strcpy(target->borrower, "-");
+        CURRENT_USER->book_count--;
+
+        // todo: do something when the user returns the book late
+
+        printf("Buku telah dikembalikan!\n");
+    }
 
     await_enter();
 }
@@ -270,10 +370,11 @@ void showuser_menu() {
                 __borrow_books(ID_SORT, ASCENDING);
                 break;
             case 2:
-                __show_borrowed_books();
+                __return_borrowed_books();
                 break;
             case 3:
                 __show_borrowed_books();
+                await_enter();
                 break;
             case 4:
                 break;
@@ -282,7 +383,6 @@ void showuser_menu() {
                 break;
             default:
                 printf("Pilihan tidak dapat ditemukan!\n");
-                await_enter();
                 isvalid = false;
                 break;
         }

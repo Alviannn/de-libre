@@ -173,3 +173,15 @@ Tidak menggunakan _memory allocation_ lagi karena sudah optimalkan. Artinya kita
 - Tipedata **int** menjadi **unsigned**
 Pada `common.h` dan `common.c` terdapat perubahan berupa tipedata `int` menjadi `unsigned` atau `unsigned int` lebih tepatnya.
 Hal ini karena `unsigned int` tidak menerima angka negatif dan hanya menerima positif, contohnya seperti id buku kan tidak mungkin negatif nilainya
+
+-----------------------------------------------------------------------
+
+29/12/2020 (3):
+
+- Function **clearscreen** pada **utils.c**
+Sepertinya macro `WIN32` tidak terdefinisi pada standard C yang lama, jadi biar tidak bermasalah diubah menjadi `_WIN32`.
+Di BINUS banyak yang menggunakan DevC++ versi 5.11, dan versi ini menggunakan standard C89 (ini standard lama, sekarang sudah C17, dan yg sebelumnya ada C99 dan C11).
+
+- Tambahan macro **WEEK_IN_SECONDS** pada **common.h**
+Macro ini menandakan nilai detik untuk seminggu.
+Macro ini diperlukan agar mempermudah pembacaan code yang berhubungan dengan maksimum lama peminjaman buku.
