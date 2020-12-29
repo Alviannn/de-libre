@@ -59,8 +59,8 @@ typedef struct book_t {
     unsigned pages;
     /** the username who borrows the book */
     char borrower[MAXNAME_LENGTH];
-    /** the date when the user borrows the book */
-    time_t btime;
+    /** the due date for the currently borrowed book */
+    time_t duetime;
 } book_t;
 
 /**

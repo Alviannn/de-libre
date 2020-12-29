@@ -53,7 +53,7 @@ void __do_borrow(book_t* book) {
 
     if (answer == 'Y') {
         strcpy(book->borrower, CURRENT_USER->name);
-        book->btime = time(NULL) + WEEK_IN_SECONDS;
+        book->duetime = time(NULL) + WEEK_IN_SECONDS;
 
         CURRENT_USER->book_ids[CURRENT_USER->book_count] = book->id;
         CURRENT_USER->book_count++;
@@ -235,7 +235,7 @@ bool __show_borrowed_books() {
         int idx = findbook(CURRENT_USER->book_ids[i]);
 
         book_t* tmp = &BOOK_LIST[idx];
-        struct tm* ltm = localtime(&tmp->btime);
+        struct tm* ltm = localtime(&tmp->duetime);
 
         char duedate[] = "dd-MM-yyyy";
         sprintf(duedate, "%02d-%02d-%d", ltm->tm_mday, ltm->tm_mon + 1, ltm->tm_year + 1900);
@@ -337,7 +337,7 @@ void __return_borrowed_books() {
             bookids[bookcount - 1] = 0;
         }
 
-        target->btime = 0;
+        target->duetime = 0;
         strcpy(target->borrower, "-");
         CURRENT_USER->book_count--;
 

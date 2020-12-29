@@ -185,3 +185,17 @@ Di BINUS banyak yang menggunakan DevC++ versi 5.11, dan versi ini menggunakan st
 - Tambahan macro **WEEK_IN_SECONDS** pada **common.h**
 Macro ini menandakan nilai detik untuk seminggu.
 Macro ini diperlukan agar mempermudah pembacaan code yang berhubungan dengan maksimum lama peminjaman buku.
+
+-----------------------------------------------------------------------
+
+29/12/2020 (4):
+
+- Struct **book_t**
+Perubahan atribut `btime` menjadi `duetime` begitu pula tujuan atribut ini.
+Sekarang atribut ini bernilai kapan buku ini seharusnya dikembalikan ke perpustakaan, sebelumnya yaitu `btime` bernilai kapan buku itu dipinjam.
+
+- Function **createbook**
+Akibat perubahan pada struct `book_t`, function ini juga terkena efeknya.
+
+- Function **isbook_borrowed**
+Untuk berjaga-jaga ditambah lagi satu kondisi untuk menyatakan bahwa buku tersebut sedang dipinjam seseorang atau tidaknya.

@@ -74,7 +74,7 @@ user_t createuser(char name[], char password[], bool isadmin, unsigned* book_ids
     return user;
 }
 
-book_t createbook(unsigned id, char title[], char author[], unsigned pages, char borrower[], time_t btime) {
+book_t createbook(unsigned id, char title[], char author[], unsigned pages, char borrower[], time_t duetime) {
     book_t book;
 
     strcpy(book.title, title);
@@ -83,7 +83,7 @@ book_t createbook(unsigned id, char title[], char author[], unsigned pages, char
 
     book.id = id;
     book.pages = pages;
-    book.btime = btime;
+    book.duetime = duetime;
 
     // adds the book to the book array
     BLENGTH++;
@@ -94,7 +94,7 @@ book_t createbook(unsigned id, char title[], char author[], unsigned pages, char
 }
 
 bool isbook_borrowed(book_t book) {
-    return strlen(book.borrower) == 0 || strcmp(book.borrower, "-");
+    return strlen(book.borrower) == 0 || strcmp(book.borrower, "-") || book.duetime == 0;
 }
 
 int finduser(char name[]) {
