@@ -104,7 +104,7 @@ int __select_sortname() {
     do {
         int choice = scan_number(">> ");
 
-        if (choice >= 0 || choice <= 5) {
+        if (choice >= 0 && choice <= 5) {
             return choice - 1;
         } else {
             isvalid = false;
@@ -126,7 +126,7 @@ int __select_sorttype() {
     do {
         int choice = scan_number(">> ");
 
-        if (choice >= 0 || choice <= 2) {
+        if (choice >= 0 && choice <= 2) {
             return choice - 1;
         } else {
             isvalid = false;
