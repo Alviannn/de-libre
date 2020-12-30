@@ -11,7 +11,7 @@ void insertbooks() {
         fscanf(file, "%d, %[^,], %[^,], %d, %[^\n]", &id, title, author, &pages, borrower);
         fgetc(file);
 
-        createbook(id, title, author, pages, borrower, WEEK_IN_SECONDS);
+        createbook(id, title, author, pages, borrower, time(NULL) - DAY_IN_SECONDS);
     }
 
     fclose(file);
@@ -25,6 +25,8 @@ void printbooks() {
 }
 
 int main() {
+    setlocale(LC_NUMERIC, "");
+    
     USER_LIST = calloc(0, sizeof(user_t));
     BOOK_LIST = calloc(0, sizeof(book_t));
 

@@ -6,16 +6,43 @@
 void __view_book(book_t* book) {
     clearscreen();
 
+    char LINE[52] = "";
+    makeline(LINE, 51);
+
     printf(
-        "---------------------------------------------------\n"
-        "Detail Buku:\n"
+        "%s\n"
+        "                    Detail Buku\n"
         "\n"
-        "Judul   : %s\n"
-        "Penulis : %s\n"
-        "Halaman : %d\n"
-        "Tersedia: %s\n"
-        "---------------------------------------------------\n",
-        book->title, book->author, book->pages, isbook_borrowed(*book) ? "No" : "Yes");
+        "%c Judul   : %s\n"
+        "%c Penulis : %s\n"
+        "%c Halaman : %d\n"
+        "%c Tersedia: %s\n"
+        "%s\n",
+        LINE,
+        250, book->title,
+        250, book->author,
+        250, book->pages,
+        250, isbook_borrowed(*book) ? "No" : "Yes",
+        LINE);
+}
+
+void __print_receipt(book_t* book, long fine) {
+    clearscreen();
+
+    char LINE[53] = "";
+    makeline(LINE, 51);
+    strcat(LINE, "\n");
+
+    printf(LINE);
+    printf(
+        "                 Pengembalian Buku\n"
+        "\n"
+        "ID   : %d\n"
+        "Judul: %s\n"
+        "\n"
+        "Denda: Rp %'ld,00\n",
+        book->id, book->title, fine);
+    printf(LINE);
 }
 
 void __do_borrow(book_t* book) {
@@ -126,7 +153,9 @@ void __borrow_books(book_sort name, sort_type type) {
             return;
         }
 
-        char LINE[] = "------------------------------------------------------------------------------------------------------------------\n";
+        char LINE[116] = "";
+        makeline(LINE, 114);
+        strcat(LINE, "\n");
 
         printf(LINE);
         printf("| %-3s | %-40s | %-40s | %-7s | %-8s |\n", "ID", "Judul", "Penulis", "Halaman", "Tersedia");
@@ -140,6 +169,7 @@ void __borrow_books(book_sort name, sort_type type) {
         }
 
         printf(LINE);
+        printf("Page: %d / %u\n", page, pack.maxpage);
 
         printf(
             "\n"
@@ -163,9 +193,11 @@ void __borrow_books(book_sort name, sort_type type) {
 
             switch (choice) {
                 case 1:
-                    targetid = scan_number("Masukkan ID buku: ");
-                    targetidx = findbook(targetid);
+                    targetid = scan_number("Masukkan ID buku [0 untuk kembali]: ");
+                    if (targetid == 0)
+                        break;
 
+                    targetidx = findbook(targetid);
                     if (targetidx == -1) {
                         printf("Tidak dapat menemukan ID buku!\n");
                         await_enter();
@@ -225,7 +257,9 @@ bool __show_borrowed_books() {
         return false;
     }
 
-    char LINE[] = "----------------------------------------------------------------------------------------------------------\n";
+    char LINE[108] = "";
+    makeline(LINE, 106);
+    strcat(LINE, "\n");
 
     printf(LINE);
     printf("| %-3s | %-40s | %-40s | %-10s |\n", "ID", "Judul", "Penulis", "Due Date");
@@ -263,21 +297,18 @@ void __return_borrowed_books() {
             return;
         }
 
-        printf("\nPengembalian buku...\n");
+        int id = scan_number("\nMasukkan ID buku [0 untuk kembali]: ");
+        if (id == 0)
+            return;
 
-        int id = scan_number("Masukkan ID buku: ");
-        uidx = -1;
+        // does linear search
+        // because 10 is the max amount, so no worries
+        for (int i = 0; i < bookcount; i++) {
+            unsigned tmpid = CURRENT_USER->book_ids[i];
 
-        if (id > 0) {
-            // does linear search
-            // because 10 is the max amount, so no worries
-            for (int i = 0; i < bookcount; i++) {
-                unsigned tmpid = CURRENT_USER->book_ids[i];
-
-                if ((unsigned)id == tmpid) {
-                    uidx = i;
-                    break;
-                }
+            if ((unsigned)id == tmpid) {
+                uidx = i;
+                break;
             }
         }
 
@@ -300,7 +331,7 @@ void __return_borrowed_books() {
                 memcpy((bookids + start), (bookids + start + 1), sizeof(int) * (bookcount - start - 1));
                 bookids[bookcount - 1] = 0;
             }
-            
+
             printf("Buku telah dikembalikan!\n");
             await_enter();
             return;
@@ -337,11 +368,19 @@ void __return_borrowed_books() {
             bookids[bookcount - 1] = 0;
         }
 
+        time_t diff = time(NULL) - target->duetime;
+
+        // if the user returns the book late
+        if (diff >= DAY_IN_SECONDS) {
+            long multiplier = diff / DAY_IN_SECONDS;
+            long totalfine = LATE_FINE * multiplier;
+
+            __print_receipt(target, totalfine);
+        }
+
         target->duetime = 0;
         strcpy(target->borrower, "-");
         CURRENT_USER->book_count--;
-
-        // todo: do something when the user returns the book late
 
         printf("Buku telah dikembalikan!\n");
     }

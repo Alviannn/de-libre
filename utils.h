@@ -35,6 +35,22 @@ double scan_number(char* message);
 void scan_string(char* message, char* dest, int size);
 
 /**
+ * @brief Makes a line
+ * 
+ * @param dest string destination
+ * @param length the line length
+ */
+void makeline(char* dest, size_t length);
+
+/**
+ * @brief Reads a password input from the console
+ * 
+ * @param dest the string destination
+ * @param size the string size (make sure it doesn't surpasses the one you've made)
+ */
+void getpass(char* dest, size_t size);
+
+/**
  * @brief Sorts an array with quick sort method (works for any kind except pointers)
  * 
  * @param base the array

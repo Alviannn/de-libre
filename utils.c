@@ -55,6 +55,41 @@ void scan_string(char* message, char* dest, int size) {
     fflush(stdin);
 }
 
+void makeline(char* dest, size_t length) {
+    strcpy(dest, "");
+    memset(dest, 196, length);
+}
+
+void getpass(char* dest, size_t size) {
+    char key = 0;
+
+    size_t count = 0;
+    strcpy(dest, "");
+
+    // as long as it's not the enter key, keep going
+    while ((key = _getch()) != 13) {
+        // does what backspace does
+        if (key == 8) {
+            count--;
+            dest[count] = 0;
+            continue;   
+        }
+
+        // if it's arrow key, skip
+        if (key == 0)
+            _getch();
+        // if the key is invalid or has reached the max size, skip
+        if (key < 32 || key > 126 || count >= size - 1)
+            continue;
+
+        dest[count] = key;
+        count++;
+    }
+
+    // string ends with a NULL character, so here it is
+    dest[size - 1] = 0;
+}
+
 void* elem_from_bytes(void* base, int idx, size_t size_elem) {
     return (base + (size_elem * idx));
 }

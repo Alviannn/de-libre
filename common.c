@@ -176,6 +176,7 @@ bookpack_t book_paginate(book_t* arr, unsigned length, book_sort name, sort_type
     bookpack_t pack;
     pack.len = len;
     pack.list = (arr + (ELEMENTS_PER_PAGE * (page - 1)));
+    pack.maxpage = maxpage;
 
     return pack;
 }

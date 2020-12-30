@@ -199,3 +199,22 @@ Akibat perubahan pada struct `book_t`, function ini juga terkena efeknya.
 
 - Function **isbook_borrowed**
 Untuk berjaga-jaga ditambah lagi satu kondisi untuk menyatakan bahwa buku tersebut sedang dipinjam seseorang atau tidaknya.
+
+-----------------------------------------------------------------------
+
+30/12/2020 (1):
+
+- Function **makeline** di **utils**
+Berguna untuk membuat sebuah garis (bukan yg pake tanda minus (-) tapi pake ASCII)
+
+- Function **getpass** di **utils**
+Berguna untuk mendapatkan password dari console, kan biasanya kalo input password itu tak terlihat, nah ini functionnya biar bisa begitu
+
+- Struct **bookpack_t** di **common.h**
+Tambahan atribut `unsigned maxpage` untuk mengetahui total halaman untuk pagination
+
+- Macro di di **common.h**
+Terdapat tambahan macro berupa `DAY_IN_SECONDS` dan `LATE_FINE`, juga tipedatanya diubah secara paksa menjadi long
+
+- **Include** di **common.h**
+Sekarang sudah dibersihkan dan hanya menggunakan apa saja yang bakal digunakan.

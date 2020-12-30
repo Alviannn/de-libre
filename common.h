@@ -9,14 +9,14 @@
 #define __COMMON_H__
 
 // built-ins libraries
+#include <conio.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <math.h>
+#include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <time.h>
 
 // local libraries
@@ -28,8 +28,12 @@
 #define ELEMENTS_PER_PAGE 10
 /** The maximum borrowed books per user */
 #define MAX_BORROW 10
+/** The secinds for a day or 24 hours */
+#define DAY_IN_SECONDS ((60L * 60L) * 24L)
 /** The seconds for 7 days or 1 week */
-#define WEEK_IN_SECONDS (((60 * 60) * 24) * 7)
+#define WEEK_IN_SECONDS ((DAY_IN_SECONDS * 7L))
+/** The fine when a user returns the book late */
+#define LATE_FINE 500L
 
 // -                                                   - //
 // ---------------------- Structs ---------------------- //
@@ -85,8 +89,12 @@ typedef enum sort_type {
 } sort_type;
 
 typedef struct bookpack_t {
+    /** the paginated book array */
     book_t* list;
+    /** the length of the elements */
     unsigned len;
+    /** the maximum page*/
+    unsigned maxpage;
 } bookpack_t;
 
 // -                                                            - //
