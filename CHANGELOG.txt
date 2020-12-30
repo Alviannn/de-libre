@@ -233,7 +233,7 @@ Dan juga terdapat tambahan penggunaan _ASCII codes_ untuk mempercantik table.
 
 -----------------------------------------------------------------------
 
-30/12/2020 (2):
+30/12/2020 (3):
 
 - User menu di **user.c**
 Perbaikan logika operator
