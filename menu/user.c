@@ -158,18 +158,19 @@ void __borrow_books(book_sort name, sort_type type) {
         strcat(LINE, "\n");
 
         printf(LINE);
-        printf("| %-3s | %-40s | %-40s | %-7s | %-8s |\n", "ID", "Judul", "Penulis", "Halaman", "Tersedia");
+        printf("%c %-3s %c %-40s %c %-40s %c %-7s %c %-8s %c\n",
+               179, "ID", 179, "Judul", 179, "Penulis", 179, "Halaman", 179, "Tersedia", 179);
         printf(LINE);
 
         for (int i = 0; i < (int)pack.len; i++) {
             book_t* tmp = &pack.list[i];
 
-            printf("| %-3u | %-40s | %-40s | %-7u | %-8s |\n",
-                   tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? "No" : "Yes");
+            printf("%c %-3u %c %-40s %c %-40s %c %-7u %c %-8s %c\n",
+                   179, tmp->id, 179, tmp->title, 179, tmp->author, 179, tmp->pages, 179, isbook_borrowed(*tmp) ? "No" : "Yes", 179);
         }
 
         printf(LINE);
-        printf("Page: %d / %u\n", page, pack.maxpage);
+        printf("Page: %d/%u\n", page, pack.maxpage);
 
         printf(
             "\n"
@@ -262,7 +263,8 @@ bool __show_borrowed_books() {
     strcat(LINE, "\n");
 
     printf(LINE);
-    printf("| %-3s | %-40s | %-40s | %-10s |\n", "ID", "Judul", "Penulis", "Due Date");
+    printf("%c %-3s %c %-40s %c %-40s %c %-10s %c\n", 
+        179, "ID", 179, "Judul", 179, "Penulis", 179, "Due Date", 179);
     printf(LINE);
 
     for (int i = 0; i < total; i++) {
@@ -275,7 +277,8 @@ bool __show_borrowed_books() {
         sprintf(duedate, "%02d-%02d-%d", ltm->tm_mday, ltm->tm_mon + 1, ltm->tm_year + 1900);
         strftime(duedate, strlen(duedate) + 1, "%d-%m-%Y", ltm);
 
-        printf("| %-3u | %-40s | %-40s | %-10s |\n", tmp->id, tmp->title, tmp->author, duedate);
+        printf("%c %-3u %c %-40s %c %-40s %c %-10s %c\n", 
+        179, tmp->id, 179, tmp->title, 179, tmp->author, 179, duedate, 179);
     }
 
     printf(LINE);
@@ -388,6 +391,50 @@ void __return_borrowed_books() {
     await_enter();
 }
 
+/**
+ * @brief Changes the user's password
+ */
+void __change_password() {
+    clearscreen();
+
+    user_t* current = CURRENT_USER;
+    char oldpass[MAXNAME_LENGTH], newpass[MAXNAME_LENGTH];
+
+    do {
+        printf("Masukkan password lama anda: ");
+        getpass(oldpass, MAXNAME_LENGTH);
+
+        if (strcmp(oldpass, current->password) != 0) {
+            printf("Password anda salah!\n");
+            continue;
+        }
+
+        break;
+    } while (true);
+
+    printf("Masukkan password baru anda: ");
+    getpass(newpass, MAXNAME_LENGTH);
+
+    do {
+        char temp[MAXNAME_LENGTH];
+
+        printf("Konfirmasi password: ");
+        getpass(temp, MAXNAME_LENGTH);
+
+        if (strcmp(newpass, temp) != 0) {
+            printf("Password anda salah!\n");
+            continue;
+        }
+
+        break;
+    } while (true);
+
+    strcpy(current->password, newpass);
+    printf("Password berhasil diubah!\n");
+
+    await_enter();
+}
+
 void showuser_menu() {
     clearscreen();
 
@@ -416,6 +463,7 @@ void showuser_menu() {
                 await_enter();
                 break;
             case 4:
+                __change_password();
                 break;
             case 0:
                 CURRENT_USER = NULL;

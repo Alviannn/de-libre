@@ -218,3 +218,15 @@ Terdapat tambahan macro berupa `DAY_IN_SECONDS` dan `LATE_FINE`, juga tipedatany
 
 - **Include** di **common.h**
 Sekarang sudah dibersihkan dan hanya menggunakan apa saja yang bakal digunakan.
+
+-----------------------------------------------------------------------
+
+30/12/2020 (2):
+
+- Function **getpass** pada **utils**
+Perbaikan fungsinya, sebelumnya keynya kurang menyamai function `scanf`.
+Dan juga perbaikan dimana jika string yg dimasukkin tidak sepenuhnya kosong.
+
+- Menu **user.c**
+Prompt change password sudah ditambahkan.
+Dan juga terdapat tambahan penggunaan _ASCII codes_ untuk mempercantik table.

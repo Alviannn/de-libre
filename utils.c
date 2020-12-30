@@ -64,7 +64,7 @@ void getpass(char* dest, size_t size) {
     char key = 0;
 
     size_t count = 0;
-    strcpy(dest, "");
+    memset(dest, 0, size);
 
     // as long as it's not the enter key, keep going
     while ((key = _getch()) != 13) {
@@ -74,6 +74,16 @@ void getpass(char* dest, size_t size) {
             dest[count] = 0;
             continue;   
         }
+
+        // if it's an escape key, delete everything
+        if (key == 27) {
+            memset(dest, 0, size);
+            count = 0;
+            continue;
+        }
+        // if it's EOT (end of text) key, exit out of program
+        if (key == 3)
+            exit(EXIT_FAILURE);
 
         // if it's arrow key, skip
         if (key == 0)
@@ -86,8 +96,13 @@ void getpass(char* dest, size_t size) {
         count++;
     }
 
-    // string ends with a NULL character, so here it is
-    dest[size - 1] = 0;
+    char echo[count + 1];
+
+    memset(echo, 0, count + 1);
+    memset(echo, '*', count);
+    strcat(echo, "\n");
+    
+    printf(echo);
 }
 
 void* elem_from_bytes(void* base, int idx, size_t size_elem) {
