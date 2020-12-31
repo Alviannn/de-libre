@@ -22,17 +22,17 @@
 // local libraries
 #include "utils.h"
 
-/** Maximum name length */
+/** Panjang maksimum string pada program ini */
 #define MAXNAME_LENGTH 41
-/** The elements shown each page */
+/** Banyak elemen pada sebuah halaman (untuk proses pembuatan halaman array buku) */
 #define ELEMENTS_PER_PAGE 10
-/** The maximum borrowed books per user */
+/** Maksimum banyak peminjaman buku per user */
 #define MAX_BORROW 10
-/** The secinds for a day or 24 hours */
+/** Jumlah detik setiap 1 hari atau 24 jam */
 #define DAY_IN_SECONDS ((60L * 60L) * 24L)
-/** The seconds for 7 days or 1 week */
+/** Jumlah detik setiap 1 minggu atau 7 hari  */
 #define WEEK_IN_SECONDS ((DAY_IN_SECONDS * 7L))
-/** The fine when a user returns the book late */
+/** Denda default untuk user yg telat mengembalikan buku */
 #define LATE_FINE 500L
 
 // -                                                   - //
@@ -40,60 +40,62 @@
 // -                                                   - //
 
 typedef struct user_t {
-    /** the user's username */
+    /** Username user */
     char name[MAXNAME_LENGTH];
-    /** the user's password */
+    /** password user */
     char password[MAXNAME_LENGTH];
-    /** determines whether the user is an admin or member */
+    /** Menentukan apakah user ini seorang admin atau member */
     bool isadmin;
-    /** The amount of borrowed books */
+    /** Banyak buku yg dipinjam user */
     int book_count;
-    /** The borrowed books (array of book id) */
+    /** Buku yg dipinjam user (array ID buku, int) */
     int book_ids[MAX_BORROW];
 } user_t;
 
 typedef struct book_t {
-    /** the book id*/
+    /** ID buku */
     int id;
-    /** the book title */
+    /** judul buku */
     char title[MAXNAME_LENGTH];
-    /** the book author */
+    /** penulis buku */
     char author[MAXNAME_LENGTH];
-    /** the book total page */
+    /** jumlah halaman buku */
     int pages;
-    /** the username who borrows the book */
+    /** Username peminjaman buku */
     char borrower[MAXNAME_LENGTH];
-    /** the due date for the currently borrowed book */
+    /** Jatuh tempo peminjaman buku */
     time_t duetime;
 } book_t;
 
 /**
- * @brief All available book sorting
+ * @brief Tipe pengurutan buku yg tersedia
  */
 typedef enum book_sort {
-    /** sorts by book id */
+    /** Mengurut berdasarkan ID buku */
     ID_SORT,
-    /** sorts by book title */
+    /** Mengurut berdasarkan judul buku */
     TITLE_SORT,
-    /** sorts by book author */
+    /** Mengurut berdasarkan penulis buku */
     AUTHOR_SORT,
-    /** sorts by total book pages (number) */
+    /** Mengurut berdasarkan jumlah halaman buku */
     PAGES_SORT,
-    /** sorts by book availablity (is it borrowed?) */
+    /** Mengurut berdasarkan status peminjaman buku */
     AVAILABILITY_SORT
 } book_sort;
 
 typedef enum sort_type {
+    /** Urutan keatas */
     ASCENDING,
+    /** Urutan kebawah */
     DESCENDING
 } sort_type;
 
 typedef struct bookpack_t {
-    /** the paginated book array */
+    /** Array buku yg dihalamankan */
     book_t* list;
-    /** the length of the elements */
+    /** Banyak elemen pada array buku yg dihalamankan */
     int len;
-    /** the maximum page*/
+    /** Halaman maksimum */
     int maxpage;
 } bookpack_t;
 
@@ -101,19 +103,19 @@ typedef struct bookpack_t {
 // ---------------------- Global Variables ---------------------- //
 // -                                                            - //
 
-/** The logged in user */
+/** User yg sedang menggunakan program (atau user pada saat ini) */
 extern user_t* CURRENT_USER;
-/** The user based book sort */
+/** Pengurut buku utama */
 extern book_sort MAIN_BOOK_SORT;
 
-/** The user array */
+/** Database user (array user) */
 extern user_t* USER_LIST;
-/** The user list length */
+/** Banyak user pada database user */
 extern size_t ULENGTH;
 
-/** The book array */
+/** Database buku (array buku) */
 extern book_t* BOOK_LIST;
-/** The book list length */
+/** Banyak buku pada database buku */
 extern size_t BLENGTH;
 
 // -                                                     - //
@@ -121,48 +123,67 @@ extern size_t BLENGTH;
 // -                                                     - //
 
 /**
- * @brief Decides the book comparator function to be used
+ * @brief Menentukan function comparator yg akan digunakan untuk pengurutan
  */
 void* book_comparator(sort_type type);
 
 /**
- * @brief Create a user instance and then also adds it to the user array
+ * @brief Membuat sebuah data struct buku, dan juga menambahkan buku tersebut ke dalam database user
+ * 
+ * @param name username user
+ * @param password password user
+ * @param isadmin status admin (true atau false)
+ * @param book_ids array id buku yg dipinjam
+ * @param book_count banyak buku yg dipinjam
  */
 user_t createuser(char name[], char password[], bool isadmin, int* book_ids, int book_count);
 
 /**
- * @brief Create a book instance and then also adds it to the book array
+ * @brief Membuat sebuah data struct buku, dan juga menambahkan buku tersebut ke dalam database buku
+ * 
+ * @param id ID buku
+ * @param title judul buku
+ * @param author penulis buku
+ * @param pages jumlah halaman buku
+ * @param borrower username peminjam buku
+ * @param duetime jatuh tempo peminjaman buku
  */
-book_t createbook(int id, char title[], char author[], int pages, char borrower[], time_t btime);
+book_t createbook(int id, char title[], char author[], int pages, char borrower[], time_t duetime);
 
 /**
- * @brief Removes a book by it's book ID
+ * @brief Menghapus buku dari database buku berdasarkan ID buku
  * 
- * @return true if the book removal process was successful, false is otherwise
+ * @return true jika penghapusan berhasil, false jika sebaliknya
  */
 bool removebook(int id);
 
 /**
- * @brief Determines if a book is being borrowed or not
+ * @brief Menentukan apakah sebuah buku sedang dipinjam atau tidak
  */
 bool isbook_borrowed(book_t book);
 
 /**
- * @brief Finds a user by the username (using binary search method)
+ * @brief Mencari sebuah user berdasarkan username (dengan menggunakan metode binary search)
  *
- * @return the index to the user, will return -1 if none is found
+ * @return Index user yang dicari, tetapi akan return -1 jika user tidak dapat ditemukan
  */
 int finduser(char name[]);
 
 /**
- * @brief Finds a book by the id (using binary search method)
+ * @brief Mencari sebuah buku berdasarkan ID buku (dengan menggunakan metode binary search)
  * 
- * @return the index to the book, will return -1 if none is found
+ * @return Index buku yang dicari, tetapi akan return -1 jika buku tidak dapat ditemukan
  */
 int findbook(int id);
 
 /**
- * @brief Creates a pagination for a book array
+ * @brief Membuat halaman (maks. 10 elemen per halaman)
+ * 
+ * @param arr target array buku
+ * @param len panjang array buku
+ * @param name tipe pengurutan buku (lihat enum book_sort)
+ * @param type tipe pengurutan (keatas atau kebawah)
+ * @param page halaman yg dituju
  */
 bookpack_t book_paginate(book_t* arr, int len, book_sort name, sort_type type, int page);
 

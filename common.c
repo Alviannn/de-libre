@@ -58,15 +58,15 @@ user_t createuser(char name[], char password[], bool isadmin, int* book_ids, int
     strcpy(user.password, password);
     user.isadmin = isadmin;
 
-    // clears the book_ids array
+    // Membersihkan bytes/memory pada array book_ids
     memset(user.book_ids, 0, sizeof(int) * MAX_BORROW);
 
-    // applies the book_ids array from the param to the attribute
+    // Memasukkan id-id buku dan juga jumlahnya pada atribut yg dituju
     user.book_count = book_count;
     if (book_ids != NULL && book_count != 0)
         memcpy(user.book_ids, book_ids, sizeof(int) * book_count);
 
-    // adds the user to the user array
+    // menambahkan user ke dalam database buku
     ULENGTH++;
     USER_LIST = safe_alloc(USER_LIST, ULENGTH, sizeof(user_t));
     USER_LIST[ULENGTH - 1] = user;
@@ -85,7 +85,7 @@ book_t createbook(int id, char title[], char author[], int pages, char borrower[
     book.pages = pages;
     book.duetime = duetime;
 
-    // adds the book to the book array
+    // menambahkan buku ke dalam database buku
     BLENGTH++;
     BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
     BOOK_LIST[BLENGTH - 1] = book;
@@ -165,7 +165,7 @@ bookpack_t book_paginate(book_t* arr, int length, book_sort name, sort_type type
     int maxpage = (length / ELEMENTS_PER_PAGE) + (length % ELEMENTS_PER_PAGE == 0 ? 0 : 1);
     int len = ELEMENTS_PER_PAGE;
 
-    // checks the selected page
+    // Mengecek halaman yang dipilih
     if (length == 0 || page < 1 || page > maxpage) {
         bookpack_t empty;
 
@@ -175,7 +175,7 @@ bookpack_t book_paginate(book_t* arr, int length, book_sort name, sort_type type
         return empty;
     }
 
-    // decide the books to be shown on the current page
+    // Menentukan jumlah buku yg akan dibagi untuk halaman ini
     if (page == maxpage) {
         len = length % ELEMENTS_PER_PAGE;
 
@@ -183,11 +183,11 @@ bookpack_t book_paginate(book_t* arr, int length, book_sort name, sort_type type
             len = ELEMENTS_PER_PAGE;
     }
 
-    // sorts the main book array
+    // mengurutkan database buku
     MAIN_BOOK_SORT = name;
     quicksort(BOOK_LIST, BLENGTH, sizeof(book_t), book_comparator(type));
 
-    // creates the book pack (just for the pagination part)
+    // membuat sebuah bookpack sebagai informasi/data dari pembuatan halaman ini
     bookpack_t pack;
     pack.len = len;
     pack.list = (arr + (ELEMENTS_PER_PAGE * (page - 1)));

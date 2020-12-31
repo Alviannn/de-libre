@@ -283,3 +283,17 @@ if (hasil) {
 ```
 
 NOTE: Semua file yang diupload pada `.zip` ini terkena efek pada update ini.
+
+-----------------------------------------------------------------------
+
+31/12/2020 (2):
+
+- **Dokumentasi code**
+Perubahan dokumentasi code dari bahasa inggris menjadi bahasa indonesia.
+Dan juga ada tambahan dokumentasi pada bagian2 code yg lain.
+
+- Function **safe_alloc** di **utils**
+Perubahan logika pengecekan memory tujuan (sebelumnya gk tau juga sih ini masalah atau gk :P)
+
+- Function **await_enter** di **utils**
+Messagenya diganti from English to Indonesia

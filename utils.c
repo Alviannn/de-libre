@@ -1,8 +1,9 @@
-#include "common.h"
 #include "utils.h"
 
+#include "common.h"
+
 void await_enter() {
-    printf("Press enter to continue...");
+    printf("Tekan enter untuk lanjut...");
     getchar();
     fflush(stdin);
 }
@@ -37,7 +38,6 @@ double scan_number(char* message) {
         if (scanresult != 0)
             break;
 
-        // printf("This input scanning only accepts numbers!\n");
         printf("Input ini hanya dapat menerima angka!\n");
     } while (1);
 
@@ -66,29 +66,35 @@ void getpass(char* dest, size_t size) {
     size_t count = 0;
     memset(dest, 0, size);
 
-    // as long as it's not the enter key, keep going
+    // selagi key yg terbaca bukan 'enter' key, lanjutnya input scanningnya
     while ((key = _getch()) != 13) {
-        // does what backspace does
+        // melakukan apa yg seharusnya 'backspace' key lakukan
+        // ya... ngedelete character per character
         if (key == 8) {
             count--;
             dest[count] = 0;
-            continue;   
+            continue;
         }
 
-        // if it's an escape key, delete everything
+        // didalam windows, jika kita tekan 'ESC' atau escape key
+        // apa yang sudah tertulis akan terhapuskan
         if (key == 27) {
             memset(dest, 0, size);
             count = 0;
             continue;
         }
-        // if it's EOT (end of text) key, exit out of program
+        // di windows, jika user menekan CTRL + C, kita akan paksa keluar dari program
+        // dan CTRL + C itu pada ASCII adalah EOT (end of text)
         if (key == 3)
             exit(EXIT_FAILURE);
-
-        // if it's arrow key, skip
-        if (key == 0)
+        // jika user menekan arrow key, skip
+        if (key == 0) {
+            // arrow key ada 2 inputnya
             _getch();
-        // if the key is invalid or has reached the max size, skip
+            continue;
+        }
+        // jika key yg ditekan invalid (tidak diketahui arti ASCII-nya) atau melebihi kapasitas string
+        // skip
         if (key < 32 || key > 126 || count >= size - 1)
             continue;
 
@@ -96,12 +102,13 @@ void getpass(char* dest, size_t size) {
         count++;
     }
 
+    // pada bagian ini kita akan echo-kan password yg diinput dengan '*'
     char echo[count + 1];
 
     memset(echo, 0, count + 1);
     memset(echo, '*', count);
     strcat(echo, "\n");
-    
+
     printf(echo);
 }
 
@@ -164,21 +171,28 @@ void quicksort(void* base, size_t num_elems, size_t size_elem, cmpfunc_t __cmp_f
 void* safe_alloc(void* mem, size_t num_elems, size_t elem_size) {
     void* tmp = NULL;
 
+    // free memory yg ditargetkan jika kosong
     if (num_elems == 0 && mem != NULL) {
         free(mem);
         mem = NULL;
-    } else {
-        if (mem == NULL)
-            tmp = malloc(num_elems * elem_size);
-        else
-            tmp = realloc(mem, num_elems * elem_size);
+        return mem;
     }
 
+    // jika target memory adalah NULL maka kita inisialisasi alokasikan memory
+    if (mem == NULL)
+        tmp = malloc(num_elems * elem_size);
+    // dan jika tidak, kita alokasi ulang memory
+    else
+        tmp = realloc(mem, num_elems * elem_size);
+
+    // jika proses alokasi memory gagal, maka kita akan hentikan program
+    // karena kegagalan ini hanya bisa terjadi karena tidak memiliki memory
     if (tmp == NULL) {
         printf(
             "\n"
             "Error: Failed to reallocate memory for %p!\n"
-            "       This is most likely caused because there's no memory available!\n", mem);
+            "       This is most likely caused because there's no memory available!\n",
+            mem);
 
         free(mem);
         exit(EXIT_FAILURE);

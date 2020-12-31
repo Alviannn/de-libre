@@ -4,76 +4,80 @@
 typedef int (*cmpfunc_t)(const void* a, const void* b);
 
 /**
- * @brief Waits for the user to press the enter key
+ * @brief Menunggu user untuk menekan 'enter'
  */
 void await_enter();
 
 /**
- * @brief Handles sleeping or delaying the program
+ * @brief Delay program atau menghentikan proses program dalam jangka waktu tertentu
  * 
- * @param millis the sleep time in milliseconds
+ * @param millis lama delay program dalam milliseconds
  */
 void sleep(long millis);
 
 /**
- * @brief Clears the console screen
+ * @brief Membersihkan layar console
  */
 void clearscreen();
 
 /**
- * @brief Gets a number value from the input
+ * @brief Mengambil input berupa angka
+ * 
+ * @param message pesan sebelum input (contoh: "Masukkan angka: ")
  */
 double scan_number(char* message);
 
 /**
-* @brief Gets a full line of string from input stream
+* @brief Mengambil string atau text lengkap dari input
 *
-* @param message the message that we can send
-* @param dest the destination string
-* @param size the string size
+* @param message pesan sebelum input (contoh: "Input nama: ")
+* @param dest string yang dituju
+* @param size panjang string
 */
 void scan_string(char* message, char* dest, int size);
 
 /**
- * @brief Makes a line
+ * @brief Membuat sebuah garis
  * 
- * @param dest string destination
- * @param length the line length
+ * @param dest string yang dituju
+ * @param length panjang garis
  */
 void makeline(char* dest, size_t length);
 
 /**
- * @brief Reads a password input from the console
+ * @brief Membaca string dari input seperti membaca password (tidak di echo hasil ketikannya)
  * 
- * @param dest the string destination
- * @param size the string size (make sure it doesn't surpasses the one you've made)
+ * @param dest string yang dituju
+ * @param size panjang string
  */
 void getpass(char* dest, size_t size);
 
 /**
  * @brief Sorts an array with quick sort method (works for any kind except pointers)
+ * @brief Mengurutkan sebuah array dengan metode quick sort (bisa digunakan pada semua macam array, kecuali array of pointer)
  * 
- * @param base the array
- * @param num_elems the total elements inside the array (or array length)
- * @param size_elem the size of each element
+ * @param base array yang ingin disort
+ * @param num_elems banyak elemen pada array
+ * @param size_elem besar bytes sebuah elemen (contoh: `sizeof(int)`)
  */
 void quicksort(void* base, size_t num_elems, size_t size_elem, cmpfunc_t __cmp_func);
 
 /**
- * @brief Allocates a memory safely, 
- *      you can use this function to initialize a memory or reallocate a memory
- *      and if you ever encounter something like out of memory, the function will stop the program.
+ * @brief Mengalokasikan sebuah memory dengan aman,
+ *      kamu dapat menggunakan function ini untuk menginisialisasi sebuah memory
+ *      atau juga mengalokasikan kembali memory yang diinginkan.
+ * 
+ *      dan jika kamu ketemu dengan sesuatu seperti Out Of Memory (kehabisan memory) 
+ *      maka function ini akan menghentikan program kita.
  *       
- *      NOTE: If you're trying to initialize a memory to a variable, make sure you use something like
- *      `var = safe_alloc(NULL, n, element_size);`
- *      This is a must because the `mem` variable never had any address to begin with.
+ *      NOTE: Disarankan bahwa kamu menggunakan nilai return dari function ini
+ *          karena ada kemungkinan jika pada parameter `mem` tidak memiliki alamat memory
+ *          maka hasil alokasi memory tersebut terambil.
  * 
- *      What about for reallocating? Yeah, you can use it however you like.
- * 
- * @param mem the memory to be allocated (NULL is possible)
- * @param num_elems the number of elements
- * @param elem_size the element size (for example like using `sizeof(int)`)
- * @return the (re)allocated memory
+ * @param mem Variable pointer (atau memory) yang dituju (bisa hanya mengisi NULL)
+ * @param num_elems banyak elemen pada tujuan memory (kalau ingin dipakai untuk 1 variable, isikan `1` saja)
+ * @param elem_size besar bytes sebuah elemen (contoh: `sizeof(int)`)
+ * @return hasil alokasi memory yang dilakukan
  */
 void* safe_alloc(void* mem, size_t num_elems, size_t elem_size);
 
