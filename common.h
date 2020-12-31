@@ -47,20 +47,20 @@ typedef struct user_t {
     /** determines whether the user is an admin or member */
     bool isadmin;
     /** The amount of borrowed books */
-    unsigned book_count;
+    int book_count;
     /** The borrowed books (array of book id) */
-    unsigned book_ids[MAX_BORROW];
+    int book_ids[MAX_BORROW];
 } user_t;
 
 typedef struct book_t {
     /** the book id*/
-    unsigned id;
+    int id;
     /** the book title */
     char title[MAXNAME_LENGTH];
     /** the book author */
     char author[MAXNAME_LENGTH];
     /** the book total page */
-    unsigned pages;
+    int pages;
     /** the username who borrows the book */
     char borrower[MAXNAME_LENGTH];
     /** the due date for the currently borrowed book */
@@ -92,9 +92,9 @@ typedef struct bookpack_t {
     /** the paginated book array */
     book_t* list;
     /** the length of the elements */
-    unsigned len;
+    int len;
     /** the maximum page*/
-    unsigned maxpage;
+    int maxpage;
 } bookpack_t;
 
 // -                                                            - //
@@ -109,12 +109,12 @@ extern book_sort MAIN_BOOK_SORT;
 /** The user array */
 extern user_t* USER_LIST;
 /** The user list length */
-extern unsigned ULENGTH;
+extern size_t ULENGTH;
 
 /** The book array */
 extern book_t* BOOK_LIST;
 /** The book list length */
-extern unsigned BLENGTH;
+extern size_t BLENGTH;
 
 // -                                                     - //
 // ---------------------- Functions ---------------------- //
@@ -128,12 +128,19 @@ void* book_comparator(sort_type type);
 /**
  * @brief Create a user instance and then also adds it to the user array
  */
-user_t createuser(char name[], char password[], bool isadmin, unsigned* book_ids, unsigned book_count);
+user_t createuser(char name[], char password[], bool isadmin, int* book_ids, int book_count);
 
 /**
  * @brief Create a book instance and then also adds it to the book array
  */
-book_t createbook(unsigned id, char title[], char author[], unsigned pages, char borrower[], time_t btime);
+book_t createbook(int id, char title[], char author[], int pages, char borrower[], time_t btime);
+
+/**
+ * @brief Removes a book by it's book ID
+ * 
+ * @return true if the book removal process was successful, false is otherwise
+ */
+bool removebook(int id);
 
 /**
  * @brief Determines if a book is being borrowed or not
@@ -152,12 +159,12 @@ int finduser(char name[]);
  * 
  * @return the index to the book, will return -1 if none is found
  */
-int findbook(unsigned id);
+int findbook(int id);
 
 /**
  * @brief Creates a pagination for a book array
  */
-bookpack_t book_paginate(book_t* arr, unsigned len, book_sort name, sort_type type, int page);
+bookpack_t book_paginate(book_t* arr, int len, book_sort name, sort_type type, int page);
 
 // -                                               - //
 // ---------------------- End ---------------------- //

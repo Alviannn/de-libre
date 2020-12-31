@@ -121,11 +121,11 @@ void __swap(const void* a, const void* b, size_t size) {
     }
 }
 
-int __partition(void* base, size_t size_elem, int low, int high, cmpfunc_t __cmp_func) {
-    int idx = low - 1;
+size_t __partition(void* base, size_t size_elem, size_t low, size_t high, cmpfunc_t __cmp_func) {
+    size_t idx = low - 1;
     void* pivot = elem_from_bytes(base, high, size_elem);
 
-    for (int i = low; i <= high - 1; i++) {
+    for (size_t i = low; i <= high - 1; i++) {
         void* temp = elem_from_bytes(base, i, size_elem);
 
         if (__cmp_func(pivot, temp) > 0) {
@@ -148,9 +148,9 @@ int __partition(void* base, size_t size_elem, int low, int high, cmpfunc_t __cmp
     return idx;
 }
 
-void __handle_quicksort(void* base, size_t size_elem, int low, int high, cmpfunc_t __cmp_func) {
+void __handle_quicksort(void* base, size_t size_elem, size_t low, size_t high, cmpfunc_t __cmp_func) {
     if (low < high) {
-        int pi = __partition(base, size_elem, low, high, __cmp_func);
+        size_t pi = __partition(base, size_elem, low, high, __cmp_func);
 
         __handle_quicksort(base, size_elem, low, pi - 1, __cmp_func);
         __handle_quicksort(base, size_elem, pi + 1, high, __cmp_func);
@@ -159,4 +159,32 @@ void __handle_quicksort(void* base, size_t size_elem, int low, int high, cmpfunc
 
 void quicksort(void* base, size_t num_elems, size_t size_elem, cmpfunc_t __cmp_func) {
     __handle_quicksort(base, size_elem, 0, num_elems - 1, __cmp_func);
+}
+
+void* safe_alloc(void* mem, size_t num_elems, size_t elem_size) {
+    void* tmp = NULL;
+
+    if (num_elems == 0 && mem != NULL) {
+        free(mem);
+        mem = NULL;
+    } else {
+        if (mem == NULL)
+            tmp = malloc(num_elems * elem_size);
+        else
+            tmp = realloc(mem, num_elems * elem_size);
+    }
+
+    if (tmp == NULL) {
+        printf(
+            "\n"
+            "Error: Failed to reallocate memory for %p!\n"
+            "       This is most likely caused because there's no memory available!\n", mem);
+
+        free(mem);
+        exit(EXIT_FAILURE);
+    } else {
+        mem = tmp;
+    }
+
+    return mem;
 }

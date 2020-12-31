@@ -4,10 +4,10 @@ user_t* CURRENT_USER = NULL;
 book_sort MAIN_BOOK_SORT = ID_SORT;
 
 user_t* USER_LIST = NULL;
-unsigned ULENGTH = 0;
+size_t ULENGTH = 0;
 
 book_t* BOOK_LIST = NULL;
-unsigned BLENGTH = 0;
+size_t BLENGTH = 0;
 
 // -                                                      - //
 // ---------------------- Comparator ---------------------- //
@@ -51,7 +51,7 @@ void* book_comparator(sort_type type) {
         return comparebook_desc;
 }
 
-user_t createuser(char name[], char password[], bool isadmin, unsigned* book_ids, unsigned book_count) {
+user_t createuser(char name[], char password[], bool isadmin, int* book_ids, int book_count) {
     user_t user;
 
     strcpy(user.name, name);
@@ -68,13 +68,13 @@ user_t createuser(char name[], char password[], bool isadmin, unsigned* book_ids
 
     // adds the user to the user array
     ULENGTH++;
-    USER_LIST = realloc(USER_LIST, ULENGTH * sizeof(user_t));
+    USER_LIST = safe_alloc(USER_LIST, ULENGTH, sizeof(user_t));
     USER_LIST[ULENGTH - 1] = user;
 
     return user;
 }
 
-book_t createbook(unsigned id, char title[], char author[], unsigned pages, char borrower[], time_t duetime) {
+book_t createbook(int id, char title[], char author[], int pages, char borrower[], time_t duetime) {
     book_t book;
 
     strcpy(book.title, title);
@@ -87,10 +87,26 @@ book_t createbook(unsigned id, char title[], char author[], unsigned pages, char
 
     // adds the book to the book array
     BLENGTH++;
-    BOOK_LIST = realloc(BOOK_LIST, BLENGTH * sizeof(book_t));
+    BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
     BOOK_LIST[BLENGTH - 1] = book;
 
     return book;
+}
+
+bool removebook(int id) {
+    if (id < 0)
+        return false;
+
+    int idx = findbook(id);
+    if (idx < -1)
+        return false;
+
+    BLENGTH--;
+    if (idx != BLENGTH)
+        memcpy((BOOK_LIST + idx), (BOOK_LIST + idx + 1), sizeof(book_t) * (BLENGTH - idx));
+    
+    BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
+    return true;
 }
 
 bool isbook_borrowed(book_t book) {
@@ -118,12 +134,11 @@ int finduser(char name[]) {
     return -1;
 }
 
-int findbook(unsigned id) {
+int findbook(int id) {
     book_sort before = MAIN_BOOK_SORT;
     MAIN_BOOK_SORT = ID_SORT;
 
     quicksort(BOOK_LIST, BLENGTH, sizeof(book_t), book_comparator(ASCENDING));
-
     MAIN_BOOK_SORT = before;
 
     int left = 0;
@@ -146,7 +161,7 @@ int findbook(unsigned id) {
     return -1;
 }
 
-bookpack_t book_paginate(book_t* arr, unsigned length, book_sort name, sort_type type, int page) {
+bookpack_t book_paginate(book_t* arr, int length, book_sort name, sort_type type, int page) {
     int maxpage = (length / ELEMENTS_PER_PAGE) + (length % ELEMENTS_PER_PAGE == 0 ? 0 : 1);
     int len = ELEMENTS_PER_PAGE;
 

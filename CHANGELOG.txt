@@ -237,3 +237,49 @@ Dan juga terdapat tambahan penggunaan _ASCII codes_ untuk mempercantik table.
 
 - User menu di **user.c**
 Perbaikan logika operator
+
+-----------------------------------------------------------------------
+
+31/12/2020 (1):
+
+- Function **safe_alloc** pada **utils**
+Function ini berguna untuk mengalokasikan memori pada saat inisialisasi maupun tidak.
+Sebelumnya kita menggunakan `malloc`, `calloc`, dan `realloc` untuk hal2 yg berhubungan dengan memory management,
+tetapi sekarang kita menggunakan function baru ini agar alokasi memori yg dilakukan aman.
+
+Dengan function2 sebelumnya bisa terjadi kasus dimana proses alokasi memori gagal, 
+dan function ini menanggulani kasus itu dengan mematikan program dan memberikan pesan error.
+Biasanya kasus seperti ini terjadi karena tidak cukupnya memori untuk program.
+
+NOTE: Semua penggunaan `malloc`, `calloc`, dan `realloc` sudah diganti dengan function ini.
+
+- Variable **unsigned** menjadi **int**
+Agar simpel aja dibacanya dan konsep programnya kita ubah saja semua `unsigned` menjadi `int` kembali.
+
+- Function **quicksort** pada **utils**
+Terjadi perubahan kecil pada tipedata `int` menjadi `size_t` agar aman saja dan mengikuti standar C dalam hal yg berhubungan seperti ini.
+
+- File **main.c**
+Pada main file kita, sudah disediakan minimal code defaultnya agar program dapat jalan dengan baik.
+
+- Function **removebook** pada **common**
+Dengan function ini kita akhirnya dapat menghapus buku dari sebuah database buku atau array buku.
+Penggunaannya sangat lah simpel, yaitu dengan memasukkan ID buku kedalam parameter function ini.
+Function ini juga membalikkan nilai `bool`, yaitu `true` jika penghapusan berhasil dan `false` jika tidak.
+
+Contoh pemakaian:
+```c
+// intinya si id buku
+int id = 22;
+// hasil proses penghapusan buku
+bool hasil = removebook(targetid);
+
+if (hasil) {
+    printf("Buku berhasil dihapus!\n");
+} else {
+    // kemungkinan terjadi karena id tidak valid atau bukunya emang tidak ada pada database.
+    printf("Buku gagal dihapus!\n");
+}
+```
+
+NOTE: Semua file yang diupload pada `.zip` ini terkena efek pada update ini.

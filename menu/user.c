@@ -307,9 +307,9 @@ void __return_borrowed_books() {
         // does linear search
         // because 10 is the max amount, so no worries
         for (int i = 0; i < bookcount; i++) {
-            unsigned tmpid = CURRENT_USER->book_ids[i];
+            int tmpid = CURRENT_USER->book_ids[i];
 
-            if ((unsigned)id == tmpid) {
+            if (id == tmpid) {
                 uidx = i;
                 break;
             }
@@ -326,7 +326,7 @@ void __return_borrowed_books() {
         // we must remove the book id from the user's instance here
         if (idx == -1) {
             int start = uidx;
-            unsigned* bookids = CURRENT_USER->book_ids;
+            int* bookids = CURRENT_USER->book_ids;
 
             if (uidx + 1 == bookcount) {
                 bookids[start] = 0;
@@ -335,6 +335,7 @@ void __return_borrowed_books() {
                 bookids[bookcount - 1] = 0;
             }
 
+            CURRENT_USER->book_count--;
             printf("Buku telah dikembalikan!\n");
             await_enter();
             return;
@@ -362,7 +363,7 @@ void __return_borrowed_books() {
 
     if (choice == 'Y') {
         int start = uidx;
-        unsigned* bookids = CURRENT_USER->book_ids;
+        int* bookids = CURRENT_USER->book_ids;
 
         if (uidx + 1 == bookcount) {
             bookids[start] = 0;
