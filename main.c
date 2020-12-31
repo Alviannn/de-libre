@@ -43,10 +43,13 @@ int main() {
         MAIN_BOOK_SORT = ID_SORT;
 
         if (CURRENT_USER == NULL) {
-            printf("User is empty!\n");
-            exit(EXIT_SUCCESS);
+            // login_menu();
+            break;
         } else {
-            showuser_menu();
+            if (CURRENT_USER->isadmin)
+                break;
+            else
+                showuser_menu();
         }
     }
 
