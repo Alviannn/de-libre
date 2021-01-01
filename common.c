@@ -51,7 +51,7 @@ void* book_comparator(sort_type type) {
         return comparebook_desc;
 }
 
-user_t createuser(char name[], char password[], bool isadmin, int* book_ids, int book_count) {
+int createuser(char name[], char password[], bool isadmin, int* book_ids, int book_count) {
     user_t user;
 
     strcpy(user.name, name);
@@ -71,10 +71,10 @@ user_t createuser(char name[], char password[], bool isadmin, int* book_ids, int
     USER_LIST = safe_alloc(USER_LIST, ULENGTH, sizeof(user_t));
     USER_LIST[ULENGTH - 1] = user;
 
-    return user;
+    return ULENGTH - 1;
 }
 
-book_t createbook(int id, char title[], char author[], int pages, char borrower[], time_t duetime) {
+int createbook(int id, char title[], char author[], int pages, char borrower[], time_t duetime) {
     book_t book;
 
     strcpy(book.title, title);
@@ -90,7 +90,7 @@ book_t createbook(int id, char title[], char author[], int pages, char borrower[
     BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
     BOOK_LIST[BLENGTH - 1] = book;
 
-    return book;
+    return BLENGTH - 1;
 }
 
 bool removebook(int id) {
@@ -102,7 +102,7 @@ bool removebook(int id) {
         return false;
 
     BLENGTH--;
-    if (idx != BLENGTH)
+    if ((size_t)idx != BLENGTH)
         memcpy((BOOK_LIST + idx), (BOOK_LIST + idx + 1), sizeof(book_t) * (BLENGTH - idx));
     
     BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
@@ -161,13 +161,13 @@ int findbook(int id) {
     return -1;
 }
 
-bookpack_t book_paginate(book_t* arr, int length, book_sort name, sort_type type, int page) {
+bookpaginate_t book_paginate(book_t* arr, int length, book_sort name, sort_type type, int page) {
     int maxpage = (length / ELEMENTS_PER_PAGE) + (length % ELEMENTS_PER_PAGE == 0 ? 0 : 1);
     int len = ELEMENTS_PER_PAGE;
 
     // Mengecek halaman yang dipilih
     if (length == 0 || page < 1 || page > maxpage) {
-        bookpack_t empty;
+        bookpaginate_t empty;
 
         empty.len = 0;
         empty.list = NULL;
@@ -188,7 +188,7 @@ bookpack_t book_paginate(book_t* arr, int length, book_sort name, sort_type type
     quicksort(BOOK_LIST, BLENGTH, sizeof(book_t), book_comparator(type));
 
     // membuat sebuah bookpack sebagai informasi/data dari pembuatan halaman ini
-    bookpack_t pack;
+    bookpaginate_t pack;
     pack.len = len;
     pack.list = (arr + (ELEMENTS_PER_PAGE * (page - 1)));
     pack.maxpage = maxpage;

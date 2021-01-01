@@ -297,3 +297,31 @@ Perubahan logika pengecekan memory tujuan (sebelumnya gk tau juga sih ini masala
 
 - Function **await_enter** di **utils**
 Messagenya diganti from English to Indonesia
+
+-----------------------------------------------------------------------
+
+01/01/2021 (1):
+
+- **Dokumentasi Code**
+Dokumentasi pada masing2 code di `utils` dan `common` sudah dilengkapi
+
+- Function **createuser** dan **createbook**
+Nilai return function ini diubah dari nilai struct yg dihasilkan menjadi index dimana struct tersebut diletakkan
+
+- Struct **bookpack_t**
+Untuk memperjelas makna struct ini, nama structnya telah diubah menjadi `bookpaginate_t`
+
+- Menu **login**
+Menu ini telah direvisi dan disesuaikan agar dapat digunakan untuk program
+
+- Menu **user**
+Terdapat perbaikan pada prompt _change password_ yaitu kondisi password yg diharuskan untuk user.
+Pada menu ini juga terdapat perbaikan prompt untuk pemilihan opsi.
+
+- File **Makefile**
+Seperti yg sudah dikatakan sebelumnya, ini berguna untuk mengcompile seluruh project aplikasi ini menjadi satu exe,
+lebih tepatnya file ini berguna untuk pengguna **Visual Studio Code** dan untuk yg lainnya seperti **DevC++** dan **CodeBlocks** tidak memerlukan file ini.
+Perubahan yg terjadi disini adalah ditambahnya file `menu/login.c` agar dapat dicompile bersama dengan file yg lainnya.
+
+- File **main**
+Sudah ditambahkan support untuk menggunakan login menu.

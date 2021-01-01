@@ -1,5 +1,6 @@
 #include "common.h"
 #include "menu/user.h"
+#include "menu/login.h"
 
 int main() {
     // digunakan untuk format angka
@@ -15,7 +16,7 @@ int main() {
         MAIN_BOOK_SORT = ID_SORT;
 
         if (CURRENT_USER == NULL) { // Jika user belum login, tunjukkan menu login
-            break; // todo: show login menu
+            showlogin_menu();
         } else { // Jika tidak tunjukkan menu admin atau user
             if (CURRENT_USER->isadmin)
                 break; // todo: show admin menu

@@ -5,7 +5,7 @@ CC = gcc
 FLAGS = -Wall -Wextra -Wundef -Wshadow -Wunreachable-code
 USE_OBJ = 0
 
-SRC = main.c utils.c common.c menu/user.c
+SRC = main.c utils.c common.c menu/login.c menu/user.c
 OBJ = $(SRC:.c=.o)
 
 ifeq ($(OS), Windows_NT)

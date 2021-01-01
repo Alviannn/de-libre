@@ -90,14 +90,14 @@ typedef enum sort_type {
     DESCENDING
 } sort_type;
 
-typedef struct bookpack_t {
+typedef struct bookpaginate_t {
     /** Array buku yg dihalamankan */
     book_t* list;
     /** Banyak elemen pada array buku yg dihalamankan */
     int len;
     /** Halaman maksimum */
     int maxpage;
-} bookpack_t;
+} bookpaginate_t;
 
 // -                                                            - //
 // ---------------------- Global Variables ---------------------- //
@@ -130,29 +130,32 @@ void* book_comparator(sort_type type);
 /**
  * @brief Membuat sebuah data struct buku, dan juga menambahkan buku tersebut ke dalam database user
  * 
- * @param name username user
- * @param password password user
- * @param isadmin status admin (true atau false)
- * @param book_ids array id buku yg dipinjam
+ * @param name       username user
+ * @param password   password user
+ * @param isadmin    status admin (true atau false)
+ * @param book_ids   array id buku yg dipinjam
  * @param book_count banyak buku yg dipinjam
+ * @return index dimana struct user ini berada
  */
-user_t createuser(char name[], char password[], bool isadmin, int* book_ids, int book_count);
+int createuser(char name[], char password[], bool isadmin, int* book_ids, int book_count);
 
 /**
  * @brief Membuat sebuah data struct buku, dan juga menambahkan buku tersebut ke dalam database buku
  * 
- * @param id ID buku
- * @param title judul buku
- * @param author penulis buku
- * @param pages jumlah halaman buku
+ * @param id       ID buku
+ * @param title    judul buku
+ * @param author   penulis buku
+ * @param pages    jumlah halaman buku
  * @param borrower username peminjam buku
- * @param duetime jatuh tempo peminjaman buku
+ * @param duetime  jatuh tempo peminjaman buku
+ * @return index dimana struct buku ini berada
  */
-book_t createbook(int id, char title[], char author[], int pages, char borrower[], time_t duetime);
+int createbook(int id, char title[], char author[], int pages, char borrower[], time_t duetime);
 
 /**
  * @brief Menghapus buku dari database buku berdasarkan ID buku
  * 
+ * @param id ID buku yang ingin dihapus
  * @return true jika penghapusan berhasil, false jika sebaliknya
  */
 bool removebook(int id);
@@ -165,6 +168,7 @@ bool isbook_borrowed(book_t book);
 /**
  * @brief Mencari sebuah user berdasarkan username (dengan menggunakan metode binary search)
  *
+ * @param name username yang dicari
  * @return Index user yang dicari, tetapi akan return -1 jika user tidak dapat ditemukan
  */
 int finduser(char name[]);
@@ -172,6 +176,7 @@ int finduser(char name[]);
 /**
  * @brief Mencari sebuah buku berdasarkan ID buku (dengan menggunakan metode binary search)
  * 
+ * @param id ID buku yang dicari
  * @return Index buku yang dicari, tetapi akan return -1 jika buku tidak dapat ditemukan
  */
 int findbook(int id);
@@ -179,13 +184,14 @@ int findbook(int id);
 /**
  * @brief Membuat halaman (maks. 10 elemen per halaman)
  * 
- * @param arr target array buku
- * @param len panjang array buku
+ * @param arr  target array buku
+ * @param len  panjang array buku
  * @param name tipe pengurutan buku (lihat enum book_sort)
  * @param type tipe pengurutan (keatas atau kebawah)
  * @param page halaman yg dituju
+ * @return hasil penghalaman array buku
  */
-bookpack_t book_paginate(book_t* arr, int len, book_sort name, sort_type type, int page);
+bookpaginate_t book_paginate(book_t* arr, int len, book_sort name, sort_type type, int page);
 
 // -                                               - //
 // ---------------------- End ---------------------- //

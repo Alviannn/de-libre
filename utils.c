@@ -1,7 +1,5 @@
 #include "utils.h"
 
-#include "common.h"
-
 void await_enter() {
     printf("Tekan enter untuk lanjut...");
     getchar();
@@ -44,11 +42,11 @@ double scan_number(char* message) {
     return input;
 }
 
-void scan_string(char* message, char* dest, int size) {
+void scan_string(char* message, char* dest, size_t size) {
     if (message != NULL)
         printf(message);
 
-    fgets(dest, size + 1, stdin);
+    fgets(dest, size, stdin);
     if (dest[strlen(dest) - 1] == '\n')
         dest[strlen(dest) - 1] = 0;
 
@@ -112,7 +110,7 @@ void getpass(char* dest, size_t size) {
     printf(echo);
 }
 
-void* elem_from_bytes(void* base, int idx, size_t size_elem) {
+void* elem_from_bytes(void* base, size_t idx, size_t size_elem) {
     return (base + (size_elem * idx));
 }
 

@@ -1,6 +1,8 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
+#include "common.h"
+
 typedef int (*cmpfunc_t)(const void* a, const void* b);
 
 /**
@@ -24,6 +26,7 @@ void clearscreen();
  * @brief Mengambil input berupa angka
  * 
  * @param message pesan sebelum input (contoh: "Masukkan angka: ")
+ * @return angka yang didapatkan dari input
  */
 double scan_number(char* message);
 
@@ -31,15 +34,15 @@ double scan_number(char* message);
 * @brief Mengambil string atau text lengkap dari input
 *
 * @param message pesan sebelum input (contoh: "Input nama: ")
-* @param dest string yang dituju
-* @param size panjang string
+* @param dest    string yang dituju
+* @param size    panjang string
 */
-void scan_string(char* message, char* dest, int size);
+void scan_string(char* message, char* dest, size_t size);
 
 /**
  * @brief Membuat sebuah garis
  * 
- * @param dest string yang dituju
+ * @param dest   string yang dituju
  * @param length panjang garis
  */
 void makeline(char* dest, size_t length);
@@ -53,12 +56,12 @@ void makeline(char* dest, size_t length);
 void getpass(char* dest, size_t size);
 
 /**
- * @brief Sorts an array with quick sort method (works for any kind except pointers)
  * @brief Mengurutkan sebuah array dengan metode quick sort (bisa digunakan pada semua macam array, kecuali array of pointer)
  * 
- * @param base array yang ingin disort
- * @param num_elems banyak elemen pada array
- * @param size_elem besar bytes sebuah elemen (contoh: `sizeof(int)`)
+ * @param base       array yang ingin disort
+ * @param num_elems  banyak elemen pada array
+ * @param size_elem  besar bytes sebuah elemen (contoh: `sizeof(int)`)
+ * @param __cmp_func function comparator yang akan digunakan untuk membandingkan elemen-elemen dari array
  */
 void quicksort(void* base, size_t num_elems, size_t size_elem, cmpfunc_t __cmp_func);
 
@@ -74,7 +77,7 @@ void quicksort(void* base, size_t num_elems, size_t size_elem, cmpfunc_t __cmp_f
  *          karena ada kemungkinan jika pada parameter `mem` tidak memiliki alamat memory
  *          maka hasil alokasi memory tersebut terambil.
  * 
- * @param mem Variable pointer (atau memory) yang dituju (bisa hanya mengisi NULL)
+ * @param mem       variable pointer (atau memory) yang dituju (bisa hanya mengisi NULL)
  * @param num_elems banyak elemen pada tujuan memory (kalau ingin dipakai untuk 1 variable, isikan `1` saja)
  * @param elem_size besar bytes sebuah elemen (contoh: `sizeof(int)`)
  * @return hasil alokasi memory yang dilakukan

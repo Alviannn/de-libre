@@ -102,7 +102,7 @@ int __select_sortname() {
 
     bool isvalid = true;
     do {
-        int choice = scan_number(">> ");
+        int choice = scan_number("Pilihan [0-5] >> ");
 
         if (choice >= 0 && choice <= 5) {
             return choice - 1;
@@ -124,7 +124,7 @@ int __select_sorttype() {
 
     bool isvalid = true;
     do {
-        int choice = scan_number(">> ");
+        int choice = scan_number("Pilihan [1-2] >> ");
 
         if (choice >= 0 && choice <= 2) {
             return choice - 1;
@@ -146,7 +146,7 @@ void __borrow_books(book_sort name, sort_type type) {
     while (true) {
         clearscreen();
 
-        bookpack_t pack = book_paginate(BOOK_LIST, BLENGTH, name, type, page);
+        bookpaginate_t pack = book_paginate(BOOK_LIST, BLENGTH, name, type, page);
         if (pack.len == 0) {
             printf("Data buku tidak dapat ditemukan!\n");
             await_enter();
@@ -182,7 +182,7 @@ void __borrow_books(book_sort name, sort_type type) {
 
         bool isvalid = true;
         do {
-            int choice = scan_number("Pilihan >> ");
+            int choice = scan_number("Pilihan [0-4] >> ");
 
             int targetid = 0;
 
@@ -263,8 +263,8 @@ bool __show_borrowed_books() {
     strcat(LINE, "\n");
 
     printf(LINE);
-    printf("%c %-3s %c %-40s %c %-40s %c %-10s %c\n", 
-        179, "ID", 179, "Judul", 179, "Penulis", 179, "Due Date", 179);
+    printf("%c %-3s %c %-40s %c %-40s %c %-10s %c\n",
+           179, "ID", 179, "Judul", 179, "Penulis", 179, "Due Date", 179);
     printf(LINE);
 
     for (int i = 0; i < total; i++) {
@@ -277,8 +277,8 @@ bool __show_borrowed_books() {
         sprintf(duedate, "%02d-%02d-%d", ltm->tm_mday, ltm->tm_mon + 1, ltm->tm_year + 1900);
         strftime(duedate, strlen(duedate) + 1, "%d-%m-%Y", ltm);
 
-        printf("%c %-3u %c %-40s %c %-40s %c %-10s %c\n", 
-        179, tmp->id, 179, tmp->title, 179, tmp->author, 179, duedate, 179);
+        printf("%c %-3u %c %-40s %c %-40s %c %-10s %c\n",
+               179, tmp->id, 179, tmp->title, 179, tmp->author, 179, duedate, 179);
     }
 
     printf(LINE);
@@ -402,9 +402,11 @@ void __change_password() {
     char oldpass[MAXNAME_LENGTH], newpass[MAXNAME_LENGTH];
 
     do {
-        printf("Masukkan password lama anda: ");
+        printf("Masukkan password lama anda [0 untuk kembali]: ");
         getpass(oldpass, MAXNAME_LENGTH);
 
+        if (strcmp(oldpass, "0") == 0)
+            return;
         if (strcmp(oldpass, current->password) != 0) {
             printf("Password anda salah!\n");
             continue;
@@ -413,17 +415,43 @@ void __change_password() {
         break;
     } while (true);
 
-    printf("Masukkan password baru anda: ");
-    getpass(newpass, MAXNAME_LENGTH);
+    do {
+        printf("Masukkan password baru anda [0 untuk kembali]: ");
+        getpass(newpass, MAXNAME_LENGTH);
+
+        if (strcmp(newpass, "0") == 0)
+            return;
+        if (strcmp(newpass, oldpass) == 0) {
+            printf("Password baru anda tidak boleh sama dengan password lama anda!\n");
+            continue;
+        }
+
+        if (strlen(newpass) < 5) {
+            printf("Password minimal terdiri dari 5 kata!\n");
+            continue;
+        }
+
+        char* charchek_ptr = strpbrk(newpass, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        char* numcheck_ptr = strpbrk(newpass, "0123456789");
+
+        if (charchek_ptr == NULL || numcheck_ptr == NULL) {
+            printf("Password harus terdiri dari huruf dan angka!\n");
+            continue;
+        }
+
+        break;
+    } while (true);
 
     do {
-        char temp[MAXNAME_LENGTH];
+        char confirm[MAXNAME_LENGTH];
 
-        printf("Konfirmasi password: ");
-        getpass(temp, MAXNAME_LENGTH);
+        printf("Konfirmasi password [0 untuk kembali]: ");
+        getpass(confirm, MAXNAME_LENGTH);
 
-        if (strcmp(newpass, temp) != 0) {
-            printf("Password anda salah!\n");
+        if (strcmp(confirm, "0") == 0)
+            return;
+        if (strcmp(newpass, confirm) != 0) {
+            printf("Password konfirmasi salah!\n");
             continue;
         }
 
@@ -451,7 +479,7 @@ void showuser_menu() {
 
     bool isvalid = true;
     do {
-        int choice = scan_number(">> ");
+        int choice = scan_number("Pilihan [0-4] >> ");
         switch (choice) {
             case 1:
                 __borrow_books(ID_SORT, ASCENDING);
