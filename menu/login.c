@@ -91,9 +91,25 @@ void __register_user() {
         break;
     } while (true);
 
+    do {
+        char confirm[MAXNAME_LENGTH];
+
+        printf("Konfirmasi password [0 untuk kembali]: ");
+        getpass(confirm, MAXNAME_LENGTH);
+
+        if (strcmp(confirm, "0") == 0)
+            return;
+        if (strcmp(password, confirm) != 0) {
+            printf("Password konfirmasi salah!\n");
+            continue;
+        }
+
+        break;
+    } while (true);
+
     printf(
         "\nRegistrasi akun telah selesai!\n"
-        "Sekarang anda dapat login ke dalam program dengan akun ini!\n");
+        "Sekarang Anda dapat login ke dalam program dengan akun ini!\n");
     createuser(username, password, false, NULL, 0);
     await_enter();
 }
@@ -101,12 +117,29 @@ void __register_user() {
 void showlogin_menu() {
     clearscreen();
 
-    printf(
-        "1. Login\n"
-        "2. Register\n"
-        "0. Keluar\n");
+    set_utf8_encoding(stdout);
+    wprintf(
+        L"╔═══╗        ╔╗     ╔╗\n"
+        L"╚╗╔╗║        ║║     ║║\n"
+        L" ║║║║╔══╗    ║║   ╔╗║╚═╗╔═╗╔══╗\n"
+        L" ║║║║║╔╗║    ║║ ╔╗╠╣║╔╗║║╔╝║╔╗║\n"
+        L"╔╝╚╝║║║═╣    ║╚═╝║║║║╚╝║║║ ║║═╣\n"
+        L"╚═══╝╚══╝    ╚═══╝╚╝╚══╝╚╝ ╚══╝\n"
+        L"\n");
 
+    wprintf(
+        L"╔════════════════╗\n"
+        L"║   LOGIN MENU   ║\n"
+        L"╠════════════════╣\n"
+        L"║  [1] Login     ║\n"
+        L"║  [2] Register  ║\n"
+        L"║  [0] Keluar    ║\n"
+        L"╚════════════════╝\n"
+        L"\n");
+
+    set_default_encoding(stdout);
     bool isvalid = true;
+
     do {
         int choice = scan_number("Pilihan [0-2] >> ");
         switch (choice) {

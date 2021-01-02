@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <fcntl.h>
 
 // local libraries
 #include "utils.h"
@@ -103,6 +104,9 @@ typedef struct bookpaginate_t {
 // ---------------------- Global Variables ---------------------- //
 // -                                                            - //
 
+/** ID buku yg terakhir dicatat */
+extern int LAST_BOOK_ID;
+
 /** User yg sedang menggunakan program (atau user pada saat ini) */
 extern user_t* CURRENT_USER;
 /** Pengurut buku utama */
@@ -150,7 +154,7 @@ int createuser(char name[], char password[], bool isadmin, int* book_ids, int bo
  * @param duetime  jatuh tempo peminjaman buku
  * @return index dimana struct buku ini berada
  */
-int createbook(int id, char title[], char author[], int pages, char borrower[], time_t duetime);
+int createbook(int id, char title[], char author[], int pages, char* borrower, time_t duetime);
 
 /**
  * @brief Menghapus buku dari database buku berdasarkan ID buku
@@ -177,9 +181,17 @@ int finduser(char name[]);
  * @brief Mencari sebuah buku berdasarkan ID buku (dengan menggunakan metode binary search)
  * 
  * @param id ID buku yang dicari
- * @return Index buku yang dicari, tetapi akan return -1 jika buku tidak dapat ditemukan
+ * @return index buku yang dicari, tetapi akan return -1 jika buku tidak dapat ditemukan
  */
 int findbook(int id);
+
+/**
+ * @brief Mencari sebuah buku berdasarkan judul buku (dengan menggunakan metode binary search)
+ * 
+ * @param title judul buku yang dicari
+ * @return index buku yang dicari, tetapi akan return -1 jika buku tidak dapat ditemukan
+ */
+int findbook_title(char title[]);
 
 /**
  * @brief Membuat halaman (maks. 10 elemen per halaman)
@@ -192,6 +204,27 @@ int findbook(int id);
  * @return hasil penghalaman array buku
  */
 bookpaginate_t book_paginate(book_t* arr, int len, book_sort name, sort_type type, int page);
+
+/**
+ * @brief Melihat detail buku
+ * 
+ * @param book buku yang dituju
+ */
+void view_book(book_t* book);
+
+/**
+ * @brief Prompt untuk seleksi tipe sortingan buku
+ * 
+ * @return enum tipe sortingan buku, -1 jika gagal
+ */
+int select_booksort();
+
+/**
+ * @brief Prompt untuk seleksi tipe sortingan
+ * 
+ * @return enum tipe sortingan, -1 jika gagal
+ */
+int select_sorttype();
 
 // -                                               - //
 // ---------------------- End ---------------------- //

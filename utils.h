@@ -1,8 +1,6 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-#include "common.h"
-
 typedef int (*cmpfunc_t)(const void* a, const void* b);
 
 /**
@@ -83,5 +81,14 @@ void quicksort(void* base, size_t num_elems, size_t size_elem, cmpfunc_t __cmp_f
  * @return hasil alokasi memory yang dilakukan
  */
 void* safe_alloc(void* mem, size_t num_elems, size_t elem_size);
+
+/**
+ * @brief Menerapkan encoding UTF-8 ke dalam sebuah target file
+ * 
+ * @param file file yang ditarget
+ */
+void set_utf8_encoding(FILE* file);
+
+void set_default_encoding(FILE* file);
 
 #endif  // ! __UTILS_H__

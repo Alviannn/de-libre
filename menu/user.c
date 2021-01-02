@@ -1,31 +1,5 @@
 #include "user.h"
 
-/**
- * @brief Views the book detail
- */
-void __view_book(book_t* book) {
-    clearscreen();
-
-    char LINE[52] = "";
-    makeline(LINE, 51);
-
-    printf(
-        "%s\n"
-        "                    Detail Buku\n"
-        "\n"
-        "%c Judul   : %s\n"
-        "%c Penulis : %s\n"
-        "%c Halaman : %d\n"
-        "%c Tersedia: %s\n"
-        "%s\n",
-        LINE,
-        250, book->title,
-        250, book->author,
-        250, book->pages,
-        250, isbook_borrowed(*book) ? "No" : "Yes",
-        LINE);
-}
-
 void __print_receipt(book_t* book, long fine) {
     clearscreen();
 
@@ -47,7 +21,7 @@ void __print_receipt(book_t* book, long fine) {
 
 void __do_borrow(book_t* book) {
     clearscreen();
-    __view_book(book);
+    view_book(book);
 
     if (isbook_borrowed(*book)) {
         printf("Buku ini sedang dipinjam oleh orang lain!\n");
@@ -61,8 +35,8 @@ void __do_borrow(book_t* book) {
     printf(
         "Apakah anda yakin ingin meminjam buku ini?\n"
         "\n"
-        "(Y) Yes\n"
-        "(N) No\n");
+        "(Y) Ya\n"
+        "(N) Tidak\n");
 
     char answer = 0;
     do {
@@ -87,54 +61,6 @@ void __do_borrow(book_t* book) {
 
         printf("Anda berhasil meminjam buku ini!\n");
     }
-}
-
-int __select_sortname() {
-    clearscreen();
-    printf(
-        "Urutan buku:\n"
-        "1. Berdasarkan ID buku\n"
-        "2. Berdasarkan judul buku\n"
-        "3. Berdasarkan penulis buku\n"
-        "4. Berdasarkan jumlah halaman buku\n"
-        "5. Berdasarkan status peminjaman\n"
-        "0. Kembali\n");
-
-    bool isvalid = true;
-    do {
-        int choice = scan_number("Pilihan [0-5] >> ");
-
-        if (choice >= 0 && choice <= 5) {
-            return choice - 1;
-        } else {
-            isvalid = false;
-            printf("Pilihan tidak dapat ditemukan!\n");
-        }
-    } while (!isvalid);
-
-    return -1;
-}
-
-int __select_sorttype() {
-    clearscreen();
-    printf(
-        "Tipe urutan:\n"
-        "1. Urutan ke atas\n"
-        "2. Urutan ke bawah\n");
-
-    bool isvalid = true;
-    do {
-        int choice = scan_number("Pilihan [1-2] >> ");
-
-        if (choice >= 0 && choice <= 2) {
-            return choice - 1;
-        } else {
-            isvalid = false;
-            printf("Pilihan tidak dapat ditemukan!\n");
-        }
-    } while (!isvalid);
-
-    return -1;
 }
 
 /**
@@ -206,21 +132,16 @@ void __borrow_books(book_sort name, sort_type type) {
                     }
 
                     targetbook = &BOOK_LIST[targetidx];
-                    if (strlen(targetbook->borrower) == 0) {
-                        printf("Buku ini sedang dipinjam oleh seseorang!");
-                        await_enter();
-                        return;
-                    }
-
                     __do_borrow(targetbook);
+                    
                     await_enter();
                     return;
                 case 2:
-                    tempsort = __select_sortname();
+                    tempsort = select_booksort();
                     if (tempsort == -1)
                         break;
 
-                    temptype = __select_sorttype();
+                    temptype = select_sorttype();
                     if (temptype == -1)
                         break;
 
@@ -348,8 +269,8 @@ void __return_borrowed_books() {
     printf(
         "Apakah anda yakin ingin mengembalikan buku ini?\n"
         "\n"
-        "(Y) Yes\n"
-        "(N) No\n");
+        "(Y) Ya\n"
+        "(N) Tidak\n");
 
     char choice = 0;
     do {
@@ -466,17 +387,21 @@ void __change_password() {
 
 void showuser_menu() {
     clearscreen();
-
-    printf(
-        "Selamat datang %s di Libras\n"
-        "\n"
-        "1. Pinjam buku\n"
-        "2. Mengembalikan buku\n"
-        "3. Lihat buku pinjaman\n"
-        "4. Ganti password\n"
-        "0. Logout\n",
+    
+    set_utf8_encoding(stdout);
+    wprintf(
+        L"╔═════════════════════════════════╗\n"
+        L"║   Selamat datang %s di Libras   ║\n"
+        L"╠═════════════════════════════════╣\n"
+        L"║  [1] Pinjam buku                ║\n"
+        L"║  [2] Mengembalikan buku         ║\n"
+        L"║  [3] Lihat buku pinjaman        ║\n"
+        L"║  [4] Ganti password             ║\n"
+        L"║  [0] Logout                     ║\n"
+        L"╚═════════════════════════════════╝\n",
         CURRENT_USER->name);
 
+    set_default_encoding(stdout);
     bool isvalid = true;
     do {
         int choice = scan_number("Pilihan [0-4] >> ");

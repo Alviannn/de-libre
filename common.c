@@ -1,5 +1,7 @@
 #include "common.h"
 
+int LAST_BOOK_ID = 0;
+
 user_t* CURRENT_USER = NULL;
 book_sort MAIN_BOOK_SORT = ID_SORT;
 
@@ -60,11 +62,13 @@ int createuser(char name[], char password[], bool isadmin, int* book_ids, int bo
 
     // Membersihkan bytes/memory pada array book_ids
     memset(user.book_ids, 0, sizeof(int) * MAX_BORROW);
+    user.book_count = 0;
 
     // Memasukkan id-id buku dan juga jumlahnya pada atribut yg dituju
-    user.book_count = book_count;
-    if (book_ids != NULL && book_count != 0)
+    if (book_ids != NULL && book_count > 0) {
         memcpy(user.book_ids, book_ids, sizeof(int) * book_count);
+        user.book_count = book_count;
+    }
 
     // menambahkan user ke dalam database buku
     ULENGTH++;
@@ -74,12 +78,14 @@ int createuser(char name[], char password[], bool isadmin, int* book_ids, int bo
     return ULENGTH - 1;
 }
 
-int createbook(int id, char title[], char author[], int pages, char borrower[], time_t duetime) {
+int createbook(int id, char title[], char author[], int pages, char* borrower, time_t duetime) {
     book_t book;
 
     strcpy(book.title, title);
     strcpy(book.author, author);
-    strcpy(book.borrower, borrower);
+
+    if (borrower != NULL && strlen(borrower) != 0)
+        strcpy(book.borrower, borrower);
 
     book.id = id;
     book.pages = pages;
@@ -104,7 +110,7 @@ bool removebook(int id) {
     BLENGTH--;
     if ((size_t)idx != BLENGTH)
         memcpy((BOOK_LIST + idx), (BOOK_LIST + idx + 1), sizeof(book_t) * (BLENGTH - idx));
-    
+
     BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
     return true;
 }
@@ -120,14 +126,14 @@ int finduser(char name[]) {
 
     do {
         mid = (left + right) / 2;
-        user_t temp = USER_LIST[mid];
+        user_t* temp = &USER_LIST[mid];
 
-        if (strcmp(name, temp.name) == 0)
+        if (strcmp(name, temp->name) == 0)
             return mid;
 
-        if (strcmp(name, temp.name) < 0)
+        if (strcmp(name, temp->name) < 0)
             right = mid - 1;
-        if (strcmp(name, temp.name) > 0)
+        if (strcmp(name, temp->name) > 0)
             left = mid + 1;
     } while (left <= right);
 
@@ -147,14 +153,42 @@ int findbook(int id) {
 
     do {
         mid = (left + right) / 2;
-        book_t temp = BOOK_LIST[mid];
+        book_t* temp = &BOOK_LIST[mid];
 
-        if (id == temp.id)
+        if (id == temp->id)
             return mid;
 
-        if (id < temp.id)
+        if (id < temp->id)
             right = mid - 1;
-        if (id > temp.id)
+        if (id > temp->id)
+            left = mid + 1;
+    } while (left <= right);
+
+    return -1;
+}
+
+int findbook_title(char title[]) {
+    book_sort before = MAIN_BOOK_SORT;
+    MAIN_BOOK_SORT = TITLE_SORT;
+
+    quicksort(BOOK_LIST, BLENGTH, sizeof(book_t), book_comparator(ASCENDING));
+    MAIN_BOOK_SORT = before;
+
+    int left = 0;
+    int right = BLENGTH - 1;
+    int mid = 0;
+
+    do {
+        mid = (left + right) / 2;
+        book_t* temp = &BOOK_LIST[mid];
+
+        int compare = strcmp(title, temp->title);
+        if (compare == 0)
+            return mid;
+
+        if (compare > 0)
+            right = mid - 1;
+        if (compare < 0)
             left = mid + 1;
     } while (left <= right);
 
@@ -194,4 +228,96 @@ bookpaginate_t book_paginate(book_t* arr, int length, book_sort name, sort_type 
     pack.maxpage = maxpage;
 
     return pack;
+}
+
+void view_book(book_t* book) {
+    clearscreen();
+
+    set_utf8_encoding(stdout);
+    wprintf(
+        L"╔══════════════════════════════════════════════════════╗\n"
+        L"║                     Detail  Buku                     ║\n"
+        L"╠══════════════════════════════════════════════════════╣\n"
+        L"║                                                      ║\n"
+        L"║ · Judul   : %-40s ║\n"
+        L"║ · Penulis : %-40s ║\n"
+        L"║ · Halaman : %-40d ║\n"
+        L"║ · Tersedia: %-40s ║\n"
+        L"║                                                      ║\n"
+        L"╚══════════════════════════════════════════════════════╝\n",
+        book->title,
+        book->author,
+        book->pages,
+        isbook_borrowed(*book) ? "No" : "Yes");
+
+    set_default_encoding(stdout);
+}
+
+int select_booksort() {
+    clearscreen();
+
+    set_utf8_encoding(stdout);
+    wprintf(
+        L"╔════════════════════════════════════════════════╗\n"
+        L"║                  URUTAN  BUKU                  ║\n"
+        L"╠════════════════════════════════════════════════╣\n"
+        L"║                                                ║\n"
+        L"║ [1] Berdasarkan ID buku                        ║\n"
+        L"║ [2] Berdasarkan judul buku                     ║\n"
+        L"║ [3] Berdasarkan penulis buku                   ║\n"
+        L"║ [4] Berdasarkan jumlah halaman buku            ║\n"
+        L"║ [5] Berdasarkan status peminjaman              ║\n"
+        L"║ [0] Kembali                                    ║\n"
+        L"║                                                ║\n"
+        L"╚════════════════════════════════════════════════╝\n"
+        L"\n");
+
+    set_default_encoding(stdout);
+    bool isvalid = true;
+
+    do {
+        int choice = scan_number("Pilihan [0-5] >> ");
+
+        if (choice >= 0 && choice <= 5) {
+            return choice - 1;
+        } else {
+            isvalid = false;
+            printf("Pilihan tidak dapat ditemukan!\n");
+        }
+    } while (!isvalid);
+
+    return -1;
+}
+
+int select_sorttype() {
+    clearscreen();
+
+    set_utf8_encoding(stdout);
+    wprintf(
+        L"╔════════════════════════════════════════════════╗\n"
+        L"║                TIPE  PENGURUTAN                ║\n"
+        L"╠════════════════════════════════════════════════╣\n"
+        L"║                                                ║\n"
+        L"║ [1] Urutan ke atas                             ║\n"
+        L"║ [2] Urutan ke bawah                            ║\n"
+        L"║ [0] Kembali                                    ║\n"
+        L"║                                                ║\n"
+        L"╚════════════════════════════════════════════════╝\n"
+        L"\n");
+
+    set_default_encoding(stdout);
+    bool isvalid = true;
+
+    do {
+        int choice = scan_number("Pilihan [0-2] >> ");
+
+        if (choice >= 0 && choice <= 2) {
+            return choice - 1;
+        } else {
+            isvalid = false;
+            printf("Pilihan tidak dapat ditemukan!\n");
+        }
+    } while (!isvalid);
+
+    return -1;
 }

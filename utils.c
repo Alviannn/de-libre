@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "common.h"
 
 void await_enter() {
     printf("Tekan enter untuk lanjut...");
@@ -68,9 +68,10 @@ void getpass(char* dest, size_t size) {
     while ((key = _getch()) != 13) {
         // melakukan apa yg seharusnya 'backspace' key lakukan
         // ya... ngedelete character per character
-        if (key == 8) {
+        if (key == 8 && count != 0) {
             count--;
             dest[count] = 0;
+            printf("\b \b");
             continue;
         }
 
@@ -98,16 +99,10 @@ void getpass(char* dest, size_t size) {
 
         dest[count] = key;
         count++;
+        printf("*");
     }
 
-    // pada bagian ini kita akan echo-kan password yg diinput dengan '*'
-    char echo[count + 1];
-
-    memset(echo, 0, count + 1);
-    memset(echo, '*', count);
-    strcat(echo, "\n");
-
-    printf(echo);
+    printf("\n");
 }
 
 void* elem_from_bytes(void* base, size_t idx, size_t size_elem) {
@@ -199,4 +194,12 @@ void* safe_alloc(void* mem, size_t num_elems, size_t elem_size) {
     }
 
     return mem;
+}
+
+void set_utf8_encoding(FILE* file) {
+    _setmode(_fileno(file), _O_U8TEXT);
+}
+
+void set_default_encoding(FILE* file) {
+    _setmode(_fileno(file), _O_TEXT);
 }
