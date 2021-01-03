@@ -211,7 +211,7 @@ void __view_books() {
         }
 
         char LINE[116] = "";
-        makeline(LINE, 114);
+        // makeline(LINE, 114);
         strcat(LINE, "\n");
 
         printf(LINE);
@@ -306,24 +306,22 @@ void __view_users() {
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
 
-    set_default_encoding(stdout);
+    wchar_t line[116];
+    wcscpy(line, L"──────────────────────────────────────────────────────────\n");
 
-    char LINE[116] = "";
-    makeline(LINE, 114);
-    strcat(LINE, "\n");
+    wprintf(line);
+    wprintf(L"│ %-3s │ %-40s │ %-5s │\n",
+            "No.", "Username", "Admin");
+    wprintf(line);
 
-    printf(LINE);
-    printf("%c %-3s %c %-40s %c %-5s %c\n",
-           179, "No.", 179, "Username", 179, "Admin", 179);
-    printf(LINE);
-
-    for (int i = 0; i < (int)ULENGTH; i++) {
+    for (size_t i = 0; i < ULENGTH; i++) {
         user_t* tmp = &USER_LIST[i];
-        printf("%c %-3d %c %-40s %c %-5s %c\n", 
-        179, i + 1, 179, tmp->name, 179, (tmp->isadmin ? "Yes" : "No"), 179);
+        wprintf(L"│ %-3llu │ %-40s │ %-5s │\n",
+                i + 1, tmp->name, (tmp->isadmin ? "Yes" : "No"));
     }
+    wprintf(line);
 
-    printf(LINE);
+    set_default_encoding(stdout);
     await_enter();
 }
 

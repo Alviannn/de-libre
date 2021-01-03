@@ -4,7 +4,7 @@ void __print_receipt(book_t* book, long fine) {
     clearscreen();
 
     char LINE[53] = "";
-    makeline(LINE, 51);
+    // makeline(LINE, 51);
     strcat(LINE, "\n");
 
     printf(LINE);
@@ -80,7 +80,7 @@ void __borrow_books(book_sort name, sort_type type) {
         }
 
         char LINE[116] = "";
-        makeline(LINE, 114);
+        // makeline(LINE, 114);
         strcat(LINE, "\n");
 
         printf(LINE);
@@ -180,7 +180,7 @@ bool __show_borrowed_books() {
     }
 
     char LINE[108] = "";
-    makeline(LINE, 106);
+    // makeline(LINE, 106);
     strcat(LINE, "\n");
 
     printf(LINE);

@@ -53,11 +53,6 @@ void scan_string(char* message, char* dest, size_t size) {
     fflush(stdin);
 }
 
-void makeline(char* dest, size_t length) {
-    strcpy(dest, "");
-    memset(dest, 196, length);
-}
-
 void getpass(char* dest, size_t size) {
     char key = 0;
 

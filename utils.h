@@ -38,14 +38,6 @@ double scan_number(char* message);
 void scan_string(char* message, char* dest, size_t size);
 
 /**
- * @brief Membuat sebuah garis
- * 
- * @param dest   string yang dituju
- * @param length panjang garis
- */
-void makeline(char* dest, size_t length);
-
-/**
  * @brief Membaca string dari input seperti membaca password (tidak di echo hasil ketikannya)
  * 
  * @param dest string yang dituju
