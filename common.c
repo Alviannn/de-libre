@@ -100,12 +100,22 @@ int createbook(int id, char title[], char author[], int pages, char* borrower, t
 }
 
 bool removebook(int id) {
-    if (id < 0)
+    if (id < 0) {
+        printf("Buku ini tidak dapat ditemukan\n");
         return false;
+    }
 
     int idx = findbook(id);
-    if (idx < -1)
+    if (idx == -1) {
+        printf("Buku ini tidak dapat ditemukan\n");
         return false;
+    }
+
+    book_t* found = &BOOK_LIST[idx];
+    if (isbook_borrowed(*found)) {
+        printf("Buku yang sedang dipinjam tidak dapat dihapus!\n");
+        return false;
+    }
 
     BLENGTH--;
     if ((size_t)idx != BLENGTH)
@@ -128,12 +138,13 @@ int finduser(char name[]) {
         mid = (left + right) / 2;
         user_t* temp = &USER_LIST[mid];
 
-        if (strcmp(name, temp->name) == 0)
+        int compare = strcmp(name, temp->name);
+        if (compare == 0)
             return mid;
 
-        if (strcmp(name, temp->name) < 0)
+        if (compare > 0)
             right = mid - 1;
-        if (strcmp(name, temp->name) > 0)
+        if (compare < 0)
             left = mid + 1;
     } while (left <= right);
 

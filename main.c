@@ -3,6 +3,22 @@
 #include "menu/user.h"
 #include "menu/admin.h"
 
+void load_books() {
+    struct _iobuf* file = fopen("books.txt", "r");
+
+    while (!feof(file)) {
+        int id, pages;
+        char title[MAXNAME_LENGTH], author[MAXNAME_LENGTH], borrower[MAXNAME_LENGTH];
+
+        fscanf(file, "%d, %[^,], %[^,], %d, %[^\n]", &id, title, author, &pages, borrower);
+        fgetc(file);
+
+        createbook(id, title, author, pages, borrower, time(NULL) - DAY_IN_SECONDS);
+    }
+
+    fclose(file);
+}
+
 int main() {
     // digunakan untuk format angka
     // misal: 100000 -> 100,000
@@ -13,6 +29,10 @@ int main() {
     BOOK_LIST = safe_alloc(BOOK_LIST, 0, sizeof(book_t));
 
     createuser("admin", "admin", true, NULL, 0);
+
+    int ids[] = {35, 52, 120};
+    createuser("Aan", "aan", false, ids, 3);
+    load_books();
 
     while (true) {
         // Reset tipe pengurutan buku utama
