@@ -77,10 +77,15 @@ void* safe_alloc(void* mem, size_t num_elems, size_t elem_size);
 /**
  * @brief Menerapkan encoding UTF-8 ke dalam sebuah target file
  * 
- * @param file file yang ditarget
+ * @param file file yang ditargetkan
  */
 void set_utf8_encoding(FILE* file);
 
+/**
+ * @brief Menerapkan encoding default C ke dalam sebuah target file
+ * 
+ * @param file file yang ditargetkan
+ */
 void set_default_encoding(FILE* file);
 
 #endif  // ! __UTILS_H__
