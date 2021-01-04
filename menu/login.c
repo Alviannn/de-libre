@@ -9,9 +9,8 @@ void __login_user() {
         L"║                   LOGIN NOTE                   ║\n"
         L"╠════════════════════════════════════════════════╣\n"
         L"║                                                ║\n"
-        L"║ · Dengan mengisikan hanya '0' akan pada input  ║\n"
-        L"║   menggagalkan registrasi dan kembali ke menu  ║\n"
-        L"║   awal.                                        ║\n"
+        L"║ · Input '0' untuk membatalkan registrasi       ║\n"
+        L"║   dan kembali ke menu awal.                    ║\n"
         L"║                                                ║\n"
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
@@ -70,9 +69,8 @@ void __register_user() {
         L"║ · Password harus terdapat angka dan huruf,     ║\n"
         L"║   panjang minimalnya adalah 5 character        ║\n"
         L"║                                                ║\n"
-        L"║ · Dengan mengisikan hanya '0' akan pada input  ║\n"
-        L"║   menggagalkan registrasi dan kembali ke menu  ║\n"
-        L"║   awal.                                        ║\n"
+        L"║ · Input '0' untuk membatalkan registrasi       ║\n"
+        L"║   dan kembali ke menu awal.                    ║\n"
         L"║                                                ║\n"
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
