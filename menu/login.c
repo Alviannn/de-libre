@@ -9,8 +9,8 @@ void __login_user() {
         L"║                   LOGIN NOTE                   ║\n"
         L"╠════════════════════════════════════════════════╣\n"
         L"║                                                ║\n"
-        L"║ · Input '0' untuk membatalkan registrasi       ║\n"
-        L"║   dan kembali ke menu awal.                    ║\n"
+        L"║ · Input '0' untuk membatalkan login dan        ║\n"
+        L"║   kembali ke menu awal.                        ║\n"
         L"║                                                ║\n"
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
