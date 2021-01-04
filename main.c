@@ -1,7 +1,7 @@
 #include "common.h"
+#include "menu/admin.h"
 #include "menu/login.h"
 #include "menu/user.h"
-#include "menu/admin.h"
 
 void load_books() {
     struct _iobuf* file = fopen("books.txt", "r");
@@ -18,15 +18,14 @@ void load_books() {
 
     fclose(file);
 }
-
 int main() {
     // digunakan untuk format angka
     // misal: 100000 -> 100,000
     setlocale(LC_NUMERIC, "");
 
     // alokasi inisialisasi database user dan buku
-    USER_LIST = safe_alloc(USER_LIST, 0, sizeof(user_t));
-    BOOK_LIST = safe_alloc(BOOK_LIST, 0, sizeof(book_t));
+    USER_LIST = safe_alloc(NULL, 1, sizeof(user_t));
+    BOOK_LIST = safe_alloc(NULL, 1, sizeof(book_t));
 
     createuser("admin", "admin", true, NULL, 0);
 

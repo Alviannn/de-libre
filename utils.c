@@ -1,5 +1,11 @@
 #include "common.h"
 
+#define ESC_KEY 27
+#define ENTER_KEY 13
+#define BACKSPACE_KEY 8
+#define EOT_KEY 3
+#define NULL_KEY 0
+
 void await_enter() {
     printf("Tekan enter untuk lanjut...");
     getchar();
@@ -60,10 +66,10 @@ void getpass(char* dest, size_t size) {
     memset(dest, 0, size);
 
     // selagi key yg terbaca bukan 'enter' key, lanjutnya input scanningnya
-    while ((key = _getch()) != 13) {
+    while ((key = _getch()) != ENTER_KEY) {
         // melakukan apa yg seharusnya 'backspace' key lakukan
         // ya... ngedelete character per character
-        if (key == 8 && count != 0) {
+        if (key == BACKSPACE_KEY && count != 0) {
             count--;
             dest[count] = 0;
             printf("\b \b");
@@ -72,17 +78,19 @@ void getpass(char* dest, size_t size) {
 
         // didalam windows, jika kita tekan 'ESC' atau escape key
         // apa yang sudah tertulis akan terhapuskan
-        if (key == 27) {
+        if (key == ESC_KEY) {
             memset(dest, 0, size);
+            for (size_t i = 0; i < count; i++)
+                printf("\b \b");
             count = 0;
             continue;
         }
         // di windows, jika user menekan CTRL + C, kita akan paksa keluar dari program
-        // dan CTRL + C itu pada ASCII adalah EOT (end of text)
-        if (key == 3)
+        // dan 'CTRL + C' itu pada ASCII adalah EOT (end of text)
+        if (key == EOT_KEY)
             exit(EXIT_FAILURE);
         // jika user menekan arrow key, skip
-        if (key == 0) {
+        if (key == NULL_KEY) {
             // arrow key ada 2 inputnya
             _getch();
             continue;
@@ -98,62 +106,6 @@ void getpass(char* dest, size_t size) {
     }
 
     printf("\n");
-}
-
-void* elem_from_bytes(void* base, size_t idx, size_t size_elem) {
-    return (base + (size_elem * idx));
-}
-
-void __swap(const void* a, const void* b, size_t size) {
-    char *p = (char*)a,
-         *q = (char*)b;
-
-    for (size_t i = 0; i < size; i++) {
-        char temp = p[i];
-
-        p[i] = q[i];
-        q[i] = temp;
-    }
-}
-
-size_t __partition(void* base, size_t size_elem, size_t low, size_t high, cmpfunc_t __cmp_func) {
-    size_t idx = low - 1;
-    void* pivot = elem_from_bytes(base, high, size_elem);
-
-    for (size_t i = low; i <= high - 1; i++) {
-        void* temp = elem_from_bytes(base, i, size_elem);
-
-        if (__cmp_func(pivot, temp) > 0) {
-            idx++;
-
-            void *p = elem_from_bytes(base, i, size_elem),
-                 *q = elem_from_bytes(base, idx, size_elem);
-
-            __swap(p, q, size_elem);
-        }
-    }
-
-    idx++;
-
-    void *p = elem_from_bytes(base, idx, size_elem),
-         *q = elem_from_bytes(base, high, size_elem);
-
-    __swap(p, q, size_elem);
-
-    return idx;
-}
-
-void __handle_quicksort(void* base, size_t size_elem, size_t low, size_t high, cmpfunc_t __cmp_func) {
-    if (low < high) {
-        size_t pi = __partition(base, size_elem, low, high, __cmp_func);
-
-        __handle_quicksort(base, size_elem, low, pi - 1, __cmp_func);
-        __handle_quicksort(base, size_elem, pi + 1, high, __cmp_func);
-    }
-}
-
-void quicksort(void* base, size_t num_elems, size_t size_elem, cmpfunc_t __cmp_func) {
-    __handle_quicksort(base, size_elem, 0, num_elems - 1, __cmp_func);
 }
 
 void* safe_alloc(void* mem, size_t num_elems, size_t elem_size) {
@@ -197,4 +149,95 @@ void set_utf8_encoding(FILE* file) {
 
 void set_default_encoding(FILE* file) {
     _setmode(_fileno(file), _O_TEXT);
+}
+
+// -                                                     - //
+// ---------------------- QuickSort ---------------------- //
+// -                                                     - //
+
+ll __partition_user(user_t* base, ll low, ll high, cmpfunc_user_t __cmpfunc) {
+    user_t* pivot = &base[high];
+    ll idx = (low - 1);
+
+    for (ll i = low; i <= high - 1; i++) {
+        user_t* a = &base[i];
+
+        if (__cmpfunc(pivot, a) > 0) {
+            idx++;
+
+            user_t* b = &base[idx];
+            user_t tmp = *a;
+
+            *a = *b;
+            *b = tmp;
+        }
+    }
+
+    idx++;
+
+    user_t* a = &base[high];
+    user_t* b = &base[idx];
+    user_t tmp = *a;
+
+    *a = *b;
+    *b = tmp;
+
+    return idx;
+}
+
+void __handlesort_user(user_t* base, ll low, ll high, cmpfunc_user_t __cmpfunc) {
+    if (low < high) {
+        ll pi = __partition_user(base, low, high, __cmpfunc);
+
+        __handlesort_user(base, low, pi - 1, __cmpfunc);
+        __handlesort_user(base, pi + 1, high, __cmpfunc);
+    }
+}
+
+void quicksort_user(user_t* base, size_t length, cmpfunc_user_t __cmpfunc) {
+    __handlesort_user(base, 0, length - 1, __cmpfunc);
+}
+
+// -------------------------------------------------------------------------------------------------- //
+
+ll __partition_book(book_t* base, ll low, ll high, cmpfunc_book_t __cmpfunc) {
+    book_t* pivot = &base[high];
+    ll idx = (low - 1);
+
+    for (ll i = low; i <= high - 1; i++) {
+        book_t* a = &base[i];
+        if (__cmpfunc(pivot, a) > 0) {
+            idx++;
+
+            book_t* b = &base[idx];
+            book_t tmp = *a;
+
+            *a = *b;
+            *b = tmp;
+        }
+    }
+
+    idx++;
+
+    book_t* a = &base[high];
+    book_t* b = &base[idx];
+    book_t tmp = *a;
+
+    *a = *b;
+    *b = tmp;
+
+    return idx;
+}
+
+void __handlesort_book(book_t* base, ll low, ll high, cmpfunc_book_t __cmpfunc) {
+    if (low < high) {
+        ll pi = __partition_book(base, low, high, __cmpfunc);
+
+        __handlesort_book(base, low, pi - 1, __cmpfunc);
+        __handlesort_book(base, pi + 1, high, __cmpfunc);
+    }
+}
+
+void quicksort_book(book_t* base, size_t length, cmpfunc_book_t __cmpfunc) {
+    __handlesort_book(base, 0, length - 1, __cmpfunc);
 }

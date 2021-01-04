@@ -2,11 +2,26 @@
 
 void __login_user() {
     clearscreen();
+
+    set_utf8_encoding(stdout);
+    wprintf(
+        L"╔════════════════════════════════════════════════╗\n"
+        L"║                   LOGIN NOTE                   ║\n"
+        L"╠════════════════════════════════════════════════╣\n"
+        L"║                                                ║\n"
+        L"║ · Dengan mengisikan hanya '0' akan pada input  ║\n"
+        L"║   menggagalkan registrasi dan kembali ke menu  ║\n"
+        L"║   awal.                                        ║\n"
+        L"║                                                ║\n"
+        L"╚════════════════════════════════════════════════╝\n"
+        L"\n");
+    set_default_encoding(stdout);
+
     int useridx = -1;
     char username[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
 
     do {
-        scan_string("Username [0 untuk kembali]: ", username, MAXNAME_LENGTH);
+        scan_string("Username: ", username, MAXNAME_LENGTH);
         if (strcmp(username, "0") == 0)
             return;
 
@@ -21,7 +36,7 @@ void __login_user() {
 
     user_t* found = &USER_LIST[useridx];
     do {
-        printf("Password [0 untuk kembali]: ");
+        printf("Password: ");
         getpass(password, MAXNAME_LENGTH);
 
         if (strcmp(password, "0") == 0)
@@ -41,15 +56,31 @@ void __login_user() {
 }
 
 void __register_user() {
-    // Note registrasi
-    // - Username tidak boleh ada spasi, panjang minimal 3 character
-    // - Password harus ada angka dan character, minimal panjang 5 character
-
     clearscreen();
-    char username[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
 
+    set_utf8_encoding(stdout);
+    wprintf(
+        L"╔════════════════════════════════════════════════╗\n"
+        L"║               REGISTRATION  NOTE               ║\n"
+        L"╠════════════════════════════════════════════════╣\n"
+        L"║                                                ║\n"
+        L"║ · Username tidak diperbolehkan ada spasi,      ║\n"
+        L"║   panjang minimalnya adalah 3 character        ║\n"
+        L"║                                                ║\n"
+        L"║ · Password harus terdapat angka dan huruf,     ║\n"
+        L"║   panjang minimalnya adalah 5 character        ║\n"
+        L"║                                                ║\n"
+        L"║ · Dengan mengisikan hanya '0' akan pada input  ║\n"
+        L"║   menggagalkan registrasi dan kembali ke menu  ║\n"
+        L"║   awal.                                        ║\n"
+        L"║                                                ║\n"
+        L"╚════════════════════════════════════════════════╝\n"
+        L"\n");
+    set_default_encoding(stdout);
+
+    char username[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
     do {
-        scan_string("Username [0 untuk kembali]: ", username, MAXNAME_LENGTH);
+        scan_string("Username: ", username, MAXNAME_LENGTH);
         if (strcmp(username, "0") == 0)
             return;
         if (strlen(username) < 3) {
@@ -70,7 +101,7 @@ void __register_user() {
     } while (true);
 
     do {
-        printf("Password [0 untuk kembali]: ");
+        printf("Password: ");
         getpass(password, MAXNAME_LENGTH);
 
         if (strcmp(password, "0") == 0)
@@ -94,7 +125,7 @@ void __register_user() {
     do {
         char confirm[MAXNAME_LENGTH];
 
-        printf("Konfirmasi password [0 untuk kembali]: ");
+        printf("Konfirmasi password: ");
         getpass(confirm, MAXNAME_LENGTH);
 
         if (strcmp(confirm, "0") == 0)

@@ -42,27 +42,8 @@ void __do_borrow(book_t* book) {
         return;
     }
 
-    printf(
-        "Apakah anda yakin ingin meminjam buku ini?\n"
-        "\n"
-        "(Y) Ya\n"
-        "(N) Tidak\n");
-
-    char answer = 0;
-    do {
-        printf(">> ");
-        answer = toupper(getchar());
-        fflush(stdin);
-        
-        if (answer != 'Y' && answer != 'N') {
-            printf("Pilihan tidak valid!\n");
-            continue;
-        }
-
-        break;
-    } while (true);
-
-    if (answer == 'Y') {
+    bool ans = await_confirmation("Apakah anda yakin ingin meminjam buku ini?\n");
+    if (ans) {
         strcpy(book->borrower, CURRENT_USER->name);
         book->duetime = time(NULL) + WEEK_IN_SECONDS;
 
@@ -294,23 +275,8 @@ void __return_borrowed_books() {
         break;
     } while (true);
 
-    printf(
-        "Apakah anda yakin ingin mengembalikan buku ini?\n"
-        "\n"
-        "(Y) Ya\n"
-        "(N) Tidak\n");
-
-    char choice = 0;
-    do {
-        if (choice != 0)
-            printf("Pilihan tidak dapat ditemukan!\n");
-
-        printf(">> ");
-        choice = toupper(getchar());
-        fflush(stdin);
-    } while (choice != 'Y' && choice != 'N');
-
-    if (choice == 'Y') {
+    bool ans = await_confirmation("Apakah anda yakin ingin mengembalikan buku ini?\n");
+    if (ans) {
         int start = uidx;
         int* bookids = CURRENT_USER->book_ids;
 

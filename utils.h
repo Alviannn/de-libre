@@ -1,7 +1,9 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-typedef int (*cmpfunc_t)(const void* a, const void* b);
+typedef long long ll;
+typedef int (*cmpfunc_book_t)(const book_t* a, const book_t* b);
+typedef int (*cmpfunc_user_t)(const user_t* a, const user_t* b);
 
 /**
  * @brief Menunggu user untuk menekan 'enter'
@@ -46,16 +48,6 @@ void scan_string(char* message, char* dest, size_t size);
 void getpass(char* dest, size_t size);
 
 /**
- * @brief Mengurutkan sebuah array dengan metode quick sort (bisa digunakan pada semua macam array, kecuali array of pointer)
- * 
- * @param base       array yang ingin disort
- * @param num_elems  banyak elemen pada array
- * @param size_elem  besar bytes sebuah elemen (contoh: `sizeof(int)`)
- * @param __cmp_func function comparator yang akan digunakan untuk membandingkan elemen-elemen dari array
- */
-void quicksort(void* base, size_t num_elems, size_t size_elem, cmpfunc_t __cmp_func);
-
-/**
  * @brief Mengalokasikan sebuah memory dengan aman,
  *      kamu dapat menggunakan function ini untuk menginisialisasi sebuah memory
  *      atau juga mengalokasikan kembali memory yang diinginkan.
@@ -87,5 +79,23 @@ void set_utf8_encoding(FILE* file);
  * @param file file yang ditargetkan
  */
 void set_default_encoding(FILE* file);
+
+/**
+ * @brief Mengurutkan array user dengan menggunakan metode quick sort
+ * 
+ * @param base array user
+ * @param length panjang array user
+ * @param __cmpfunc function comparator khusus untuk user array
+ */
+void quicksort_user(user_t* base, size_t length, cmpfunc_user_t __cmpfunc);
+
+/**
+ * @brief Mengurutkan array book dengan menggunakan metode quick sort
+ * 
+ * @param base array book
+ * @param length panjang array book
+ * @param __cmpfunc function comparator khusus untuk book array
+ */
+void quicksort_book(book_t* base, size_t length, cmpfunc_book_t __cmpfunc);
 
 #endif  // ! __UTILS_H__

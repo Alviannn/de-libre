@@ -21,9 +21,6 @@
 #include <wchar.h>
 #include <fcntl.h>
 
-// local libraries
-#include "utils.h"
-
 /** Panjang maksimum string pada program ini */
 #define MAXNAME_LENGTH 41
 /** Banyak elemen pada sebuah halaman (untuk proses pembuatan halaman array buku) */
@@ -133,7 +130,7 @@ extern size_t BLENGTH;
 void* book_comparator(sort_type type);
 
 /**
- * @brief Membuat sebuah data struct buku, dan juga menambahkan buku tersebut ke dalam database user
+ * @brief Membuat sebuah data struct buku, dan juga menambahkan user tersebut ke dalam database user
  * 
  * @param name       username user
  * @param password   password user
@@ -227,8 +224,19 @@ int select_booksort();
  */
 int select_sorttype();
 
+/**
+ * @brief Menunggu user untuk mengkonfirmasi jawabannya
+ * 
+ * @param message pesan yang akan dikirimkan kepada user
+ * @return true jika mendapatkan jawaban Iya, false jika Tidak
+ */
+bool await_confirmation(char* message);
+
 // -                                               - //
 // ---------------------- End ---------------------- //
 // -                                               - //
+
+// local libraries
+#include "utils.h"
 
 #endif  // ! __COMMON_H__

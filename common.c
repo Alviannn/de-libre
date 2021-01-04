@@ -15,31 +15,32 @@ size_t BLENGTH = 0;
 // ---------------------- Comparator ---------------------- //
 // -                                                      - //
 
-int comparebook_asc(const void* a, const void* b) {
-    book_t p = *(book_t*)a;
-    book_t q = *(book_t*)b;
-
+int comparebook_asc(const book_t* a, const book_t* b) {
     switch (MAIN_BOOK_SORT) {
         case ID_SORT:
-            return p.id - q.id;
+            return a->id - b->id;
         case TITLE_SORT:
-            return strcmp(p.title, q.title);
+            return strcmp(a->title, b->title);
         case AUTHOR_SORT:
-            return strcmp(p.author, q.author);
+            return strcmp(a->author, b->author);
         case PAGES_SORT:
-            return p.pages - q.pages;
+            return a->pages - b->pages;
         case AVAILABILITY_SORT:
-            if (!isbook_borrowed(p) && !isbook_borrowed(q))
-                return p.id - q.id;
+            if (!isbook_borrowed(*a) && !isbook_borrowed(*b))
+                return a->id - b->id;
             else
-                return !isbook_borrowed(q);
+                return !isbook_borrowed(*b);
     }
 
-    return p.id - q.id;
+    return a->id - b->id;
 }
 
-int comparebook_desc(const void* a, const void* b) {
+int comparebook_desc(const book_t* a, const book_t* b) {
     return comparebook_asc(b, a);
+}
+
+int compareuser(const user_t* a, const user_t* b) {
+    return strcmp(a->name, b->name);
 }
 
 // -                                                     - //
@@ -100,7 +101,7 @@ int createbook(int id, char title[], char author[], int pages, char* borrower, t
 }
 
 bool removebook(int id) {
-    if (id < 0) {
+    if (id <= 0) {
         printf("Buku ini tidak dapat ditemukan\n");
         return false;
     }
@@ -122,6 +123,8 @@ bool removebook(int id) {
         memcpy((BOOK_LIST + idx), (BOOK_LIST + idx + 1), sizeof(book_t) * (BLENGTH - idx));
 
     BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
+
+    printf("Buku berhasil dihapuskan dari database!\n");
     return true;
 }
 
@@ -133,6 +136,8 @@ int finduser(char name[]) {
     int left = 0;
     int right = ULENGTH - 1;
     int mid = 0;
+
+    quicksort_user(USER_LIST, ULENGTH, compareuser);
 
     do {
         mid = (left + right) / 2;
@@ -155,7 +160,7 @@ int findbook(int id) {
     book_sort before = MAIN_BOOK_SORT;
     MAIN_BOOK_SORT = ID_SORT;
 
-    quicksort(BOOK_LIST, BLENGTH, sizeof(book_t), book_comparator(ASCENDING));
+    quicksort_book(BOOK_LIST, BLENGTH, book_comparator(ASCENDING));
     MAIN_BOOK_SORT = before;
 
     int left = 0;
@@ -182,7 +187,7 @@ int findbook_title(char title[]) {
     book_sort before = MAIN_BOOK_SORT;
     MAIN_BOOK_SORT = TITLE_SORT;
 
-    quicksort(BOOK_LIST, BLENGTH, sizeof(book_t), book_comparator(ASCENDING));
+    quicksort_book(BOOK_LIST, BLENGTH, book_comparator(ASCENDING));
     MAIN_BOOK_SORT = before;
 
     int left = 0;
@@ -230,7 +235,7 @@ bookpaginate_t book_paginate(book_t* arr, int length, book_sort name, sort_type 
 
     // mengurutkan database buku
     MAIN_BOOK_SORT = name;
-    quicksort(BOOK_LIST, BLENGTH, sizeof(book_t), book_comparator(type));
+    quicksort_book(BOOK_LIST, BLENGTH, book_comparator(type));
 
     // membuat sebuah bookpack sebagai informasi/data dari pembuatan halaman ini
     bookpaginate_t pack;
@@ -331,4 +336,33 @@ int select_sorttype() {
     } while (!isvalid);
 
     return -1;
+}
+
+bool await_confirmation(char* message) {
+    if (message == NULL || strlen(message) == 0) {
+        printf("Gagal dalam membuat konfirmasi!\n");
+        return false;
+    }
+
+    printf(
+        "%s"
+        "\n"
+        "(Y) Ya\n"
+        "(N) Tidak\n", message);
+
+    char answer = 0;
+    do {
+        printf(">> ");
+        answer = toupper(getchar());
+        fflush(stdin);
+
+        if (answer != 'Y' && answer != 'N') {
+            printf("Pilihan tidak valid!\n");
+            continue;
+        }
+
+        break;
+    } while (true);
+
+    return answer == 'Y';
 }

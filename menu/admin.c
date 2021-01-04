@@ -55,32 +55,102 @@ void __add_book() {
 }
 
 void __remove_book() {
-    clearscreen();
+    int page = 1;
 
-    set_utf8_encoding(stdout);
-    wprintf(
-        L"╔════════════════════════════════════════════════╗\n"
-        L"║                   Hapus Buku                   ║\n"
-        L"╚════════════════════════════════════════════════╝\n"
-        L"\n");
+    book_sort name = ID_SORT;
+    sort_type type = ASCENDING;
 
-    set_default_encoding(stdout);
-    int targetid;
+    while (true) {
+        clearscreen();
 
-    do {
-        targetid = scan_number("Masukkan ID buku: ");
-        if (targetid < 0) {
-            printf("ID buku tidak dapat negatif!\n");
-            continue;
+        set_utf8_encoding(stdout);
+        wprintf(
+            L"╔════════════════════════════════════════════════╗\n"
+            L"║                   Hapus Buku                   ║\n"
+            L"╚════════════════════════════════════════════════╝\n"
+            L"\n");
+
+        bookpaginate_t pack = book_paginate(BOOK_LIST, BLENGTH, name, type, page);
+        if (pack.len == 0) {
+            set_default_encoding(stdout);
+            printf("Data buku tidak dapat ditemukan!\n");
+            await_enter();
+            return;
         }
 
-        break;
-    } while (1);
+        wchar_t LINE[116];
+        wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
 
-    if (removebook(targetid))
-        printf("Buku berhasil dihapus!\n");
+        wprintf(LINE);
+        wprintf(L"│ %-3s │ %-40s │ %-40s │ %-7s │ %-8s │\n", "ID", "Judul", "Penulis", "Halaman", "Tersedia");
+        wprintf(LINE);
 
-    await_enter();
+        for (int i = 0; i < pack.len; i++) {
+            book_t* tmp = &pack.list[i];
+
+            wprintf(L"│ %-3d │ %-40s │ %-40s │ %-7d │ %-8s │\n",
+                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? "No" : "Yes");
+        }
+
+        wprintf(LINE);
+
+        set_default_encoding(stdout);
+        printf(
+            "Page: %d/%d\n"
+            "\n"
+            "1. Pilih buku\n"
+            "2. Urutkan buku\n"
+            "3. Halaman selanjutnya\n"
+            "4. Halaman sebelumnya\n"
+            "0. Kembali\n",
+            page, pack.maxpage);
+
+        bool isvalid = true;
+        do {
+            int choice = scan_number("Pilihan [0-4] >> ");
+
+            int targetid = 0;
+            int tempsort = 0;
+            int temptype = 0;
+
+            switch (choice) {
+                case 1:
+                    targetid = scan_number("Masukkan ID buku [0 untuk kembali]: ");
+                    if (targetid == 0)
+                        break;
+
+                    if (await_confirmation("Apakah anda yakin ingin menghapus buku ini?\n")) {
+                        removebook(targetid);
+                        await_enter();
+                    }
+                    return;
+                case 2:
+                    tempsort = select_booksort();
+                    if (tempsort == -1)
+                        break;
+
+                    temptype = select_sorttype();
+                    if (temptype == -1)
+                        break;
+
+                    name = (book_sort)tempsort;
+                    type = (sort_type)temptype;
+                    break;
+                case 3:
+                    page++;
+                    break;
+                case 4:
+                    page--;
+                    break;
+                case 0:
+                    return;
+                default:
+                    printf("Pilihan tidak dapat ditemukan!\n");
+                    isvalid = false;
+                    break;
+            }
+        } while (!isvalid);
+    }
 }
 
 void __view_books() {
@@ -118,7 +188,7 @@ void __view_books() {
             book_t* tmp = &pack.list[i];
 
             wprintf(L"│ %-3d │ %-40s │ %-40s │ %-7d │ %-8s │\n",
-                   tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? "No" : "Yes");
+                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? "No" : "Yes");
         }
 
         wprintf(LINE);
