@@ -3,35 +3,28 @@
 #include "menu/login.h"
 #include "menu/user.h"
 
-void load_books() {
-    struct _iobuf* file = fopen("books.txt", "r");
+// int main() {
+//     delete_recursively("kjashajks");
+//     return 0;
+// }
 
-    while (!feof(file)) {
-        int id, pages;
-        char title[MAXNAME_LENGTH], author[MAXNAME_LENGTH], borrower[MAXNAME_LENGTH];
-
-        fscanf(file, "%d, %[^,], %[^,], %d, %[^\n]", &id, title, author, &pages, borrower);
-        fgetc(file);
-
-        createbook(id, title, author, pages, borrower, time(NULL) - DAY_IN_SECONDS);
-    }
-
-    fclose(file);
-}
 int main() {
     // digunakan untuk format angka
     // misal: 100000 -> 100,000
     setlocale(LC_NUMERIC, "");
 
-    // alokasi inisialisasi database user dan buku
-    USER_LIST = safe_alloc(NULL, 1, sizeof(user_t));
-    BOOK_LIST = safe_alloc(NULL, 1, sizeof(book_t));
+    USER_LIST = malloc(sizeof(user_t));
+    BOOK_LIST = malloc(sizeof(book_t));
 
-    createuser("admin", "admin", true, NULL, 0);
+    mkdir(DATABASE_PATH);
 
-    int ids[] = {35, 52, 120};
-    createuser("Aan", "aan", false, ids, 3);
     load_books();
+    load_users();
+
+    if (finduser("admin") == -1) {
+        createuser("admin", "admin", true, NULL, 0);
+        save_users();
+    }
 
     while (true) {
         // Reset tipe pengurutan buku utama
@@ -46,6 +39,9 @@ int main() {
                 showuser_menu();
         }
     }
+
+    save_users();
+    save_books();
 
     if (USER_LIST != NULL)
         free(USER_LIST);

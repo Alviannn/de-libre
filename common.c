@@ -118,6 +118,10 @@ bool removebook(int id) {
         return false;
     }
 
+    char bookpath[FILENAME_MAX];
+    sprintf(bookpath, BOOK_DATABASE_PATH "/%d", found->id);
+    delete_recursively(bookpath);
+
     BLENGTH--;
     if ((size_t)idx != BLENGTH)
         memcpy((BOOK_LIST + idx), (BOOK_LIST + idx + 1), sizeof(book_t) * (BLENGTH - idx));
@@ -125,11 +129,12 @@ bool removebook(int id) {
     BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
 
     printf("Buku berhasil dihapuskan dari database!\n");
+    save_books();
     return true;
 }
 
 bool isbook_borrowed(book_t book) {
-    return strlen(book.borrower) == 0 || strcmp(book.borrower, "-") || book.duetime == 0;
+    return strlen(book.borrower) != 0 && strcmp(book.borrower, "-") != 0 && book.duetime != 0;
 }
 
 int finduser(char name[]) {
@@ -147,9 +152,9 @@ int finduser(char name[]) {
         if (compare == 0)
             return mid;
 
-        if (compare > 0)
-            right = mid - 1;
         if (compare < 0)
+            right = mid - 1;
+        if (compare > 0)
             left = mid + 1;
     } while (left <= right);
 
@@ -202,9 +207,9 @@ int findbook_title(char title[]) {
         if (compare == 0)
             return mid;
 
-        if (compare > 0)
-            right = mid - 1;
         if (compare < 0)
+            right = mid - 1;
+        if (compare > 0)
             left = mid + 1;
     } while (left <= right);
 
@@ -365,4 +370,221 @@ bool await_confirmation(char* message) {
     } while (true);
 
     return answer == 'Y';
+}
+
+void save_books() {
+    mkdir(BOOK_DATABASE_PATH);
+
+    FILE* lastidfile = fopen(BOOK_DATABASE_PATH "/lastid.txt", "w");
+    fprintf(lastidfile, "%d\n", LAST_BOOK_ID);
+    fclose(lastidfile);
+
+    for (size_t i = 0; i < BLENGTH; i++) {
+        book_t tmp = BOOK_LIST[i];
+
+        int buf = FILENAME_MAX + strlen(BOOK_DATABASE_PATH);
+
+        char path[buf];
+        sprintf(path, BOOK_DATABASE_PATH "/%d", tmp.id);
+        mkdir(path);
+
+        buf += 13;
+
+        char metadata[buf];
+
+        strcpy(metadata, path);
+        strcat(metadata, "/");
+        strcat(metadata, "metadata.txt");
+
+        FILE* curfile = fopen(metadata, "w");
+        fprintf(curfile, "%d;%s;%s;%d;%s;%lld\n",
+                tmp.id, tmp.title, tmp.author, tmp.pages, tmp.borrower, tmp.duetime);
+        fclose(curfile);
+    }
+}
+
+void load_books() {
+    FILE* flastid = fopen(BOOK_DATABASE_PATH "/lastid.txt", "r");
+    if (flastid != NULL) {
+        fscanf(flastid, "%d", &LAST_BOOK_ID);
+        fclose(flastid);
+    } else {
+        LAST_BOOK_ID = 0;
+    }
+
+    DIR* folder = opendir(BOOK_DATABASE_PATH);
+    if (folder == NULL)
+        return;
+
+    struct dirent* readd = NULL;
+    int count = 0;
+
+    while ((readd = readdir(folder)) != NULL) {
+        count++;
+
+        if (count <= 2)
+            continue;
+        if (strstr(readd->d_name, ".txt") != NULL)
+            continue;
+
+        int buf = FILENAME_MAX + strlen(BOOK_DATABASE_PATH);
+
+        int rawid = atoi(readd->d_name);
+        char metadatapath[buf + 13];
+
+        sprintf(metadatapath, BOOK_DATABASE_PATH "/%d/metadata.txt", rawid);
+
+        int id, pages;
+        char title[MAXNAME_LENGTH],
+            author[MAXNAME_LENGTH],
+            borrower[MAXNAME_LENGTH];
+        time_t duetime;
+
+        FILE* file = fopen(metadatapath, "r");
+        if (file != NULL) {
+            fscanf(file, "%d;%[^;];%[^;];%d;%[^;];%lld", &id, title, author, &pages, borrower, &duetime);
+            fclose(file);
+            createbook(id, title, author, pages, borrower, duetime);
+        }
+    }
+
+    closedir(folder);
+}
+
+void save_users() {
+    FILE* file = fopen(USER_DATABASE_PATH, "w");
+
+    for (size_t i = 0; i < ULENGTH; i++) {
+        user_t tmp = USER_LIST[i];
+
+        char borrowed[101 + 11] = "";
+        for (size_t j = 0; j < MAX_BORROW; j++) {
+            char intstr[11] = "";
+
+            sprintf(intstr, ";%d", tmp.book_ids[j]);
+            strcat(borrowed, intstr);
+        }
+        strcat(borrowed, "\n");
+
+        fprintf(file, "%s;%s;%d;%d%s", tmp.name, tmp.password, tmp.isadmin, tmp.book_count, borrowed);
+    }
+
+    fclose(file);
+}
+
+void load_users() {
+    FILE* file = fopen(USER_DATABASE_PATH, "r");
+    while (!feof(file)) {
+        char name[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
+        int book_count, book_ids[MAX_BORROW];
+        int isadmin;
+
+        char tmp[101 + 11];
+
+        int scanres = fscanf(file, "%[^;];%[^;];%d;%d;%[^\n]", name, password, &isadmin, &book_count, tmp);
+        if (scanres == EOF || fgetc(file) == EOF)
+            break;
+
+        int idx = 0;
+        char* token = strtok(tmp, ";");
+
+        while (token != NULL) {
+            int bookid = atoi(token);
+            book_ids[idx++] = bookid;
+
+            token = strtok(NULL, ";");
+        }
+
+        printf("%s is created\n", name);
+        createuser(name, password, isadmin, book_ids, book_count);
+    }
+
+    fclose(file);
+}
+
+bool readbook(book_t* current, int page) {
+    clearscreen();
+
+    if (!isbook_borrowed(*current)) {
+        printf("Anda sedang tidak meminjam buku ini!\n");
+        return false;
+    }
+    if (strcmp(current->borrower, CURRENT_USER->name) != 0) {
+        printf("Anda bukanlah orang yang meminjam buku ini!\n");
+        return false;
+    }
+    if (page > current->pages) {
+        printf("Buku ini hanya terdapat %d halaman!\n", current->pages);
+        return false;
+    }
+
+    char path[FILENAME_MAX];
+    sprintf(path, BOOK_DATABASE_PATH "/%d/%d.txt", current->id, page);
+
+    FILE* file = fopen(path, "r");
+    if (file == NULL) {
+        printf("Tidak dapat menemukan halaman %d pada buku!\n", page);
+        return false;
+    }
+
+    char line[257] = "";
+    while (fgets(line, 257, file) != NULL)
+        printf("%s", line);
+    fclose(file);
+
+    printf(
+        "\n"
+        "\n"
+        "Halaman: %d/%d\n"
+        "Tekan 'enter' untuk selesai membaca...\n", page, current->pages);
+
+    getchar();
+    fflush(stdin);
+    return true;
+}
+
+/**
+ * @brief Shows the user's borrowed books
+ * 
+ * @return true if the function successfully executed, false is otherwise
+ */
+bool show_borrowed_books() {
+    clearscreen();
+
+    int total = CURRENT_USER->book_count;
+    if (total == 0) {
+        printf("Anda sedang tidak meminjam buku apapun!\n");
+        return false;
+    }
+
+    MAIN_BOOK_SORT = ID_SORT;
+    quicksort_book(BOOK_LIST, BLENGTH, book_comparator(ASCENDING));
+
+    set_utf8_encoding(stdout);
+    wchar_t LINE[108];
+    wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
+
+    wprintf(LINE);
+    wprintf(L"│ %-3s │ %-40s │ %-40s │ %-10s │\n", "ID", "Judul", "Penulis", "Due Date");
+    wprintf(LINE);
+
+    for (int i = 0; i < total; i++) {
+        set_default_encoding(stdout);
+        int idx = findbook(CURRENT_USER->book_ids[i]);
+
+        book_t* tmp = &BOOK_LIST[idx];
+        struct tm* ltm = localtime(&tmp->duetime);
+
+        char duedate[] = "dd-MM-yyyy";
+        sprintf(duedate, "%02d-%02d-%d", ltm->tm_mday, ltm->tm_mon + 1, ltm->tm_year + 1900);
+        strftime(duedate, strlen(duedate) + 1, "%d-%m-%Y", ltm);
+
+        set_utf8_encoding(stdout);
+        wprintf(L"│ %-3d │ %-40s │ %-40s │ %-10s │\n", tmp->id, tmp->title, tmp->author, duedate);
+    }
+
+    wprintf(LINE);
+    set_default_encoding(stdout);
+
+    return true;
 }

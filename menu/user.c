@@ -51,6 +51,9 @@ void __do_borrow(book_t* book) {
         CURRENT_USER->book_count++;
 
         printf("Anda berhasil meminjam buku ini!\n");
+
+        save_books();
+        save_users();
     }
 }
 
@@ -164,49 +167,6 @@ void __borrow_books(book_sort name, sort_type type) {
     }
 }
 
-/**
- * @brief Shows the user's borrowed books
- * 
- * @return true if the function successfully executed, false is otherwise
- */
-bool __show_borrowed_books() {
-    clearscreen();
-
-    int total = CURRENT_USER->book_count;
-    if (total == 0) {
-        printf("Anda sedang tidak meminjam buku apapun!\n");
-        return false;
-    }
-
-    set_utf8_encoding(stdout);
-    wchar_t LINE[108];
-    wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
-
-    wprintf(LINE);
-    wprintf(L"│ %-3s │ %-40s │ %-40s │ %-10s │\n", "ID", "Judul", "Penulis", "Due Date");
-    wprintf(LINE);
-
-    for (int i = 0; i < total; i++) {
-        set_default_encoding(stdout);
-        int idx = findbook(CURRENT_USER->book_ids[i]);
-
-        book_t* tmp = &BOOK_LIST[idx];
-        struct tm* ltm = localtime(&tmp->duetime);
-
-        char duedate[] = "dd-MM-yyyy";
-        sprintf(duedate, "%02d-%02d-%d", ltm->tm_mday, ltm->tm_mon + 1, ltm->tm_year + 1900);
-        strftime(duedate, strlen(duedate) + 1, "%d-%m-%Y", ltm);
-
-        set_utf8_encoding(stdout);
-        wprintf(L"│ %-3d │ %-40s │ %-40s │ %-10s │\n", tmp->id, tmp->title, tmp->author, duedate);
-    }
-
-    wprintf(LINE);
-    set_default_encoding(stdout);
-
-    return true;
-}
-
 void __return_borrowed_books() {
     book_t* target = NULL;
     // the index on user instance
@@ -224,7 +184,7 @@ void __return_borrowed_books() {
             L"\n");
         set_default_encoding(stdout);
 
-        bool res = __show_borrowed_books();
+        bool res = show_borrowed_books();
         if (!res) {
             await_enter();
             return;
@@ -252,26 +212,8 @@ void __return_borrowed_books() {
         }
 
         int idx = findbook(id);
-        // incase when the selected book is not in the db but the user has it
-        // we must remove the book id from the user's instance here
-        if (idx == -1) {
-            int start = uidx;
-            int* bookids = CURRENT_USER->book_ids;
-
-            if (uidx + 1 == bookcount) {
-                bookids[start] = 0;
-            } else {
-                memcpy((bookids + start), (bookids + start + 1), sizeof(int) * (bookcount - start - 1));
-                bookids[bookcount - 1] = 0;
-            }
-
-            CURRENT_USER->book_count--;
-            printf("Buku telah dikembalikan!\n");
-            await_enter();
-            return;
-        }
-
         target = &BOOK_LIST[idx];
+        
         break;
     } while (true);
 
@@ -300,6 +242,9 @@ void __return_borrowed_books() {
         target->duetime = 0;
         strcpy(target->borrower, "-");
         CURRENT_USER->book_count--;
+
+        save_books();
+        save_users();
 
         printf("Buku telah dikembalikan!\n");
     }
@@ -387,6 +332,53 @@ void __change_password() {
     await_enter();
 }
 
+void __read_book() {
+    clearscreen();
+
+    bool canshow = show_borrowed_books();
+    if (!canshow) {
+        await_enter();
+        return;
+    }
+
+    book_t* current = NULL;
+    printf(
+        "NOTE: Anda dapat mengisi '0' untuk keluar dari menu ini!\n"
+        "\n");
+
+    while (true) {
+        if (current == NULL) {
+            int id = scan_number("Masukkan ID buku yang ingin dibaca: ");
+
+            if (id == 0)
+                return;
+            if (id < 1)
+                printf("ID buku tidak valid!\n");
+
+            int idx = findbook(id);
+            if (idx == -1)
+                printf("Tidak dapat menemukan buku dengan ID ini!\n");
+
+            current = &BOOK_LIST[idx];
+        }
+
+        clearscreen();
+        printf(
+            "NOTE: Anda dapat mengisi '0' untuk keluar dari menu ini!\n"
+            "\n");
+
+
+        printf("Masukkan halaman yang ingin dibaca [1-%d]: ", current->pages);
+        int page = scan_number(NULL);
+        if (page == 0)
+            return;
+
+        bool canread = readbook(current, page);
+        if (!canread)
+            await_enter();
+    }
+}
+
 void showuser_menu() {
     clearscreen();
 
@@ -399,7 +391,8 @@ void showuser_menu() {
         L"║ [1] Pinjam buku                                ║\n"
         L"║ [2] Mengembalikan buku                         ║\n"
         L"║ [3] Lihat buku pinjaman                        ║\n"
-        L"║ [4] Ganti password                             ║\n"
+        L"║ [4] Baca buku pinjaman                         ║\n"
+        L"║ [5] Ganti password                             ║\n"
         L"║ [0] Logout                                     ║\n"
         L"║                                                ║\n"
         L"╚════════════════════════════════════════════════╝\n"
@@ -418,10 +411,13 @@ void showuser_menu() {
                 __return_borrowed_books();
                 break;
             case 3:
-                __show_borrowed_books();
+                show_borrowed_books();
                 await_enter();
                 break;
             case 4:
+                __read_book();
+                break;
+            case 5:
                 __change_password();
                 break;
             case 0:

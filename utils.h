@@ -98,4 +98,19 @@ void quicksort_user(user_t* base, size_t length, cmpfunc_user_t __cmpfunc);
  */
 void quicksort_book(book_t* base, size_t length, cmpfunc_book_t __cmpfunc);
 
+/**
+ * @brief Menentukan apakah file itu adalah sebuah folder atau bukan
+ * 
+ * @param path alamat file
+ * @return true jika file yang ditentui adalah sebuah folder, false jika sebaliknya
+ */
+bool isdir(char* path);
+
+/**
+ * @brief Menghapus sebuah folder atau file secara rekursif
+ * 
+ * @param path alamat file yang ingin dihapuskan
+ */
+void delete_recursively(char* path);
+
 #endif  // ! __UTILS_H__

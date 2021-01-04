@@ -241,3 +241,48 @@ void __handlesort_book(book_t* base, ll low, ll high, cmpfunc_book_t __cmpfunc) 
 void quicksort_book(book_t* base, size_t length, cmpfunc_book_t __cmpfunc) {
     __handlesort_book(base, 0, length - 1, __cmpfunc);
 }
+
+bool isdir(char* path) {
+    if (path == NULL)
+        return false;
+
+    struct stat filestat;
+    if (stat(path, &filestat) != 0)
+        return false;
+
+    return S_ISDIR(filestat.st_mode);
+}
+
+void delete_recursively(char* path) {
+    if (path == NULL)
+        return;
+
+    if (!isdir(path)) {
+        remove(path);
+        return;
+    }
+
+    DIR* dir = opendir(path);
+    struct dirent* readd = NULL;
+
+    char anotherpath[FILENAME_MAX * 2];
+
+    int count = 0;
+    while ((readd = readdir(dir)) != NULL) {
+        count++;
+        if (count <= 2)
+            continue;
+
+        strcpy(anotherpath, path);
+        strcat(anotherpath, "/");
+        strcat(anotherpath, readd->d_name);
+
+        if (isdir(anotherpath))
+            delete_recursively(anotherpath);
+        else
+            remove(anotherpath);
+    }
+
+    rmdir(path);
+    closedir(dir);
+}

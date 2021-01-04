@@ -48,9 +48,19 @@ void __add_book() {
         }
 
         createbook(++LAST_BOOK_ID, title, author, pages, "-", 0L);
-        printf("Buku berhasil ditambahkan!\n");
+        printf(
+            "Buku berhasil ditambahkan!\n"
+            "\n"
+            "CATATAN:\n"
+            "Buku yang telah ditambahkan tidak langsung mendapatkan isi-isi buku tersebut!\n"
+            "\n"
+            "Untuk menambahkan isi buku atau halaman buku:\n"
+            "1. Letakkan file text (.txt) ke dalam folder dengan ID buku yang diinginkan\n"
+            "2. Nama file text tersebut harus berupa angka untuk merepresentasikan halaman buku.\n"
+            "3. Selesai!\n");
     }
 
+    save_books();
     await_enter();
 }
 
@@ -253,6 +263,7 @@ void __view_books() {
                     page--;
                     break;
                 case 0:
+                    CURRENT_USER = NULL;
                     return;
                 default:
                     printf("Pilihan tidak dapat ditemukan!\n");

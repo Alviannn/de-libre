@@ -12,6 +12,7 @@
 #include <conio.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <fcntl.h>
 #include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -19,7 +20,7 @@
 #include <string.h>
 #include <time.h>
 #include <wchar.h>
-#include <fcntl.h>
+#include <sys/stat.h>
 
 /** Panjang maksimum string pada program ini */
 #define MAXNAME_LENGTH 41
@@ -33,6 +34,13 @@
 #define WEEK_IN_SECONDS ((DAY_IN_SECONDS * 7L))
 /** Denda default untuk user yg telat mengembalikan buku */
 #define LATE_FINE 500L
+
+// Alamat folder database utama
+#define DATABASE_PATH "./DATABASE"
+// Alamat file/folder database buku
+#define BOOK_DATABASE_PATH DATABASE_PATH "/BOOK_DB"
+// Alamat file database user
+#define USER_DATABASE_PATH DATABASE_PATH "/user_db.txt"
 
 // -                                                   - //
 // ---------------------- Structs ---------------------- //
@@ -231,6 +239,42 @@ int select_sorttype();
  * @return true jika mendapatkan jawaban Iya, false jika Tidak
  */
 bool await_confirmation(char* message);
+
+/**
+ * @brief Meyimpan database buku
+ */
+void save_books();
+
+/**
+ * @brief Membaca database buku pada file
+ */
+void load_books();
+
+/**
+ * @brief Meyimpan database user pada file
+ */
+void save_users();
+
+/**
+ * @brief Membaca database user pada file
+ */
+void load_users();
+
+/**
+ * @brief Membaca buku pada halaman tertentu
+ * 
+ * @param current Pointer buku yang ingin dibaca
+ * @param page halaman pada buku
+ * @return true jika buku dapat dibaca, false jika sebaliknya
+ */
+bool readbook(book_t* current, int page);
+
+/**
+ * @brief Menampilkan buku-buku yang sedang dipinjm user
+ * 
+ * @return true jika user ada buku yang dipinjam, false jika tidak ada buku yang dipinjam
+ */
+bool show_borrowed_books();
 
 // -                                               - //
 // ---------------------- End ---------------------- //
