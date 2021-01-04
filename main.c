@@ -3,11 +3,6 @@
 #include "menu/login.h"
 #include "menu/user.h"
 
-// int main() {
-//     delete_recursively("kjashajks");
-//     return 0;
-// }
-
 int main() {
     // digunakan untuk format angka
     // misal: 100000 -> 100,000

@@ -145,6 +145,49 @@ void __register_user() {
     await_enter();
 }
 
+void __exit_program() {
+    clearscreen();
+
+    set_utf8_encoding(stdout);
+
+    wchar_t msg[970];
+    wcscpy(msg,
+          L"╔════════════════════════════════════════════════╗\n"
+          L"║            ___                                 ║\n"
+          L"║             | |_  _  _ |    \\/ _               ║\n"
+          L"║             | | |(_|| ||<   / (_)|_|           ║\n"
+          L"║                                                ║\n"
+          L"║                                                ║\n"
+          L"║  Terima kasih sudah menggunakan aplikasi ini!  ║\n"
+          L"║                                                ║\n"
+          L"║                  Anggota (4):                  ║\n"
+          L"║   (1) Alexander Yoga Setiawan - 2440076002     ║\n"
+          L"║   (2) Alvian Daru Quthni      - 2440113686     ║\n"
+          L"║   (3) Fadlan Muhammad Bahtiar - 2440113566     ║\n"
+          L"║   (4) Rahmat Syifana Jaelani  - 2440113585     ║\n"
+          L"║                                                ║\n"
+          L"║                    GROUP  3                    ║\n"
+          L"║          TOPIC: Aplikasi Perpustakaan          ║\n"
+          L"║                  KELAS:  LC01                  ║\n"
+          L"║                                                ║\n"
+          L"╚════════════════════════════════════════════════╝\n");
+
+    int count = 0;
+
+    for (int i = 0; i < 19; i++) {
+        for (int j = 0; j < 51; j++)
+            wprintf(L"%lc", msg[count++]);
+
+        sleep(50);
+    }
+    
+    wprintf(L"\n");
+
+    set_default_encoding(stdout);
+
+    exit(EXIT_SUCCESS);
+}
+
 void showlogin_menu() {
     clearscreen();
 
@@ -183,8 +226,7 @@ void showlogin_menu() {
                 __register_user();
                 break;
             case 0:
-                // todo: pesan keluar?
-                exit(EXIT_SUCCESS);
+                __exit_program();
                 break;
             default:
                 printf("Pilihan tidak dapat ditemukan!\n");
