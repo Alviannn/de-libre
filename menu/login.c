@@ -3,7 +3,6 @@
 void __login_user() {
     clearscreen();
 
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔════════════════════════════════════════════════╗\n"
         L"║                   LOGIN NOTE                   ║\n"
@@ -14,19 +13,18 @@ void __login_user() {
         L"║                                                ║\n"
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
-    set_default_encoding(stdout);
 
     int useridx = -1;
-    char username[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
+    wchar_t username[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
 
     do {
-        scan_string("Username: ", username, MAXNAME_LENGTH);
-        if (strcmp(username, "0") == 0)
+        scan_string(L"Username: ", username, MAXNAME_LENGTH);
+        if (wcscmp(username, L"0") == 0)
             return;
 
         useridx = finduser(username);
         if (useridx == -1) {
-            printf("Akun dengan username ini tidak dapat ditemukan!\n");
+            wprintf(L"Akun dengan username ini tidak dapat ditemukan!\n");
             continue;
         }
 
@@ -35,14 +33,14 @@ void __login_user() {
 
     user_t* found = &USER_LIST[useridx];
     do {
-        printf("Password: ");
+        wprintf(L"Password: ");
         getpass(password, MAXNAME_LENGTH);
 
-        if (strcmp(password, "0") == 0)
+        if (wcscmp(password, L"0") == 0)
             return;
 
-        if (strcmp(password, found->password) != 0) {
-            printf("Password yang anda masukkan salah!\n");
+        if (wcscmp(password, found->password) != 0) {
+            wprintf(L"Password yang anda masukkan salah!\n");
             continue;
         }
 
@@ -50,14 +48,13 @@ void __login_user() {
     } while (true);
 
     CURRENT_USER = found;
-    printf("\nAnda telah berhasil login!\n");
+    wprintf(L"\nAnda telah berhasil login!\n");
     await_enter();
 }
 
 void __register_user() {
     clearscreen();
 
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔════════════════════════════════════════════════╗\n"
         L"║               REGISTRATION  NOTE               ║\n"
@@ -74,24 +71,23 @@ void __register_user() {
         L"║                                                ║\n"
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
-    set_default_encoding(stdout);
 
-    char username[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
+    wchar_t username[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
     do {
-        scan_string("Username: ", username, MAXNAME_LENGTH);
-        if (strcmp(username, "0") == 0)
+        scan_string(L"Username: ", username, MAXNAME_LENGTH);
+        if (wcscmp(username, L"0") == 0)
             return;
-        if (strlen(username) < 3) {
-            printf("Username minimal terdiri dari 3 kata!\n");
+        if (wcslen(username) < 3) {
+            wprintf(L"Username minimal terdiri dari 3 kata!\n");
             continue;
         }
 
-        if (strchr(username, ' ') != NULL) {
-            printf("Spasi pada username tidak diperbolehkan\n");
+        if (wcschr(username, L' ') != NULL) {
+            wprintf(L"Spasi pada username tidak diperbolehkan\n");
             continue;
         }
         if (finduser(username) != -1) {
-            printf("Username telah terpakai!\n");
+            wprintf(L"Username telah terpakai!\n");
             continue;
         }
 
@@ -99,21 +95,21 @@ void __register_user() {
     } while (true);
 
     do {
-        printf("Password: ");
+        wprintf(L"Password: ");
         getpass(password, MAXNAME_LENGTH);
 
-        if (strcmp(password, "0") == 0)
+        if (wcscmp(password, L"0") == 0)
             return;
-        if (strlen(password) < 5) {
-            printf("Password minimal terdiri dari 5 kata!\n");
+        if (wcslen(password) < 5) {
+            wprintf(L"Password minimal terdiri dari 5 kata!\n");
             continue;
         }
 
-        char* charchek_ptr = strpbrk(password, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        char* numcheck_ptr = strpbrk(password, "0123456789");
+        wchar_t* charchek_ptr = wcspbrk(password, L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        wchar_t* numcheck_ptr = wcspbrk(password, L"0123456789");
 
         if (charchek_ptr == NULL || numcheck_ptr == NULL) {
-            printf("Password harus terdiri dari huruf dan angka!\n");
+            wprintf(L"Password harus terdiri dari huruf dan angka!\n");
             continue;
         }
 
@@ -121,32 +117,33 @@ void __register_user() {
     } while (true);
 
     do {
-        char confirm[MAXNAME_LENGTH];
+        wchar_t confirm[MAXNAME_LENGTH];
 
-        printf("Konfirmasi password: ");
+        wprintf(L"Konfirmasi password: ");
         getpass(confirm, MAXNAME_LENGTH);
 
-        if (strcmp(confirm, "0") == 0)
+        if (wcscmp(confirm, L"0") == 0)
             return;
-        if (strcmp(password, confirm) != 0) {
-            printf("Password konfirmasi salah!\n");
+        if (wcscmp(password, confirm) != 0) {
+            wprintf(L"Password konfirmasi salah!\n");
             continue;
         }
 
         break;
     } while (true);
 
-    printf(
-        "\nRegistrasi akun telah selesai!\n"
-        "Sekarang Anda dapat login ke dalam program dengan akun ini!\n");
+    wprintf(
+        L"\nRegistrasi akun telah selesai!\n"
+        L"Sekarang Anda dapat login ke dalam program dengan akun ini!\n");
+
     createuser(username, password, false, NULL, 0);
+    save_users();
+    
     await_enter();
 }
 
 void __exit_program() {
     clearscreen();
-
-    set_utf8_encoding(stdout);
 
     wchar_t msg[970];
     wcscpy(msg,
@@ -181,7 +178,6 @@ void __exit_program() {
     }
     
     wprintf(L"\n");
-    set_default_encoding(stdout);
 
     await_enter();
     exit(EXIT_SUCCESS);
@@ -190,7 +186,6 @@ void __exit_program() {
 void showlogin_menu() {
     clearscreen();
 
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔═══╗        ╔╗     ╔╗\n"
         L"╚╗╔╗║        ║║     ║║\n"
@@ -212,11 +207,10 @@ void showlogin_menu() {
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
 
-    set_default_encoding(stdout);
     bool isvalid = true;
 
     do {
-        int choice = scan_number("Pilihan [0-2] >> ");
+        int choice = scan_number(L"Pilihan [0-2] >> ");
         switch (choice) {
             case 1:
                 __login_user();
@@ -228,7 +222,7 @@ void showlogin_menu() {
                 __exit_program();
                 break;
             default:
-                printf("Pilihan tidak dapat ditemukan!\n");
+                wprintf(L"Pilihan tidak dapat ditemukan!\n");
                 isvalid = false;
                 break;
         }

@@ -3,7 +3,6 @@
 void __print_receipt(book_t* book, long fine) {
     clearscreen();
 
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔════════════════════════════════════════════════╗\n"
         L"║               Pengembalian  Buku               ║\n"
@@ -12,45 +11,41 @@ void __print_receipt(book_t* book, long fine) {
 
     wprintf(
         L"ID    : %d\n"
-        L"Judul : %s\n"
+        L"Judul : %ls\n"
         L"\n"
         L"Denda : Rp %'ld,00\n",
         book->id, book->title, fine);
-
-    set_default_encoding(stdout);
 }
 
 void __do_borrow(book_t* book) {
     clearscreen();
 
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔════════════════════════════════════════════════╗\n"
         L"║           Konfirmasi Peminjaman Buku           ║\n"
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
-    set_default_encoding(stdout);
 
     view_book(book);
 
     if (isbook_borrowed(*book)) {
-        printf("Buku ini sedang dipinjam oleh orang lain!\n");
+        wprintf(L"Buku ini sedang dipinjam oleh orang lain!\n");
         return;
     }
     if (CURRENT_USER->book_count >= MAX_BORROW) {
-        printf("Anda hanya dapat meminjam 10 buku!\n");
+        wprintf(L"Anda hanya dapat meminjam 10 buku!\n");
         return;
     }
 
-    bool ans = await_confirmation("Apakah anda yakin ingin meminjam buku ini?\n");
+    bool ans = await_confirmation(L"Apakah anda yakin ingin meminjam buku ini?\n");
     if (ans) {
-        strcpy(book->borrower, CURRENT_USER->name);
+        wcscpy(book->borrower, CURRENT_USER->name);
         book->duetime = time(NULL) + WEEK_IN_SECONDS;
 
         CURRENT_USER->book_ids[CURRENT_USER->book_count] = book->id;
         CURRENT_USER->book_count++;
 
-        printf("Anda berhasil meminjam buku ini!\n");
+        wprintf(L"Anda berhasil meminjam buku ini!\n");
 
         save_books();
         save_users();
@@ -66,7 +61,6 @@ void __borrow_books(book_sort name, sort_type type) {
     while (true) {
         clearscreen();
 
-        set_utf8_encoding(stdout);
         wprintf(
             L"╔════════════════════════════════════════════════╗\n"
             L"║                 Meminjam  Buku                 ║\n"
@@ -75,8 +69,7 @@ void __borrow_books(book_sort name, sort_type type) {
 
         bookpaginate_t pack = book_paginate(BOOK_LIST, BLENGTH, name, type, page);
         if (pack.len == 0) {
-            set_default_encoding(stdout);
-            printf("Data buku tidak dapat ditemukan!\n");
+            wprintf(L"Data buku tidak dapat ditemukan!\n");
             await_enter();
             return;
         }
@@ -85,7 +78,7 @@ void __borrow_books(book_sort name, sort_type type) {
         wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
 
         wprintf(LINE);
-        wprintf(L"│ %-3s │ %-40s │ %-40s │ %-7s │ %-8s │\n", "ID", "Judul", "Penulis", "Halaman", "Tersedia");
+        wprintf(L"│ %-3ls │ %-40ls │ %-40ls │ %-7ls │ %-8ls │\n", L"ID", L"Judul", L"Penulis", L"Halaman", L"Tersedia");
         wprintf(LINE);
 
         int i = 0;
@@ -93,25 +86,24 @@ void __borrow_books(book_sort name, sort_type type) {
             book_t* tmp = &pack.list[i];
 
             wprintf(L"│ %-3d │ %-40s │ %-40s │ %-7u │ %-8s │\n",
-                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? "No" : "Yes");
+                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? L"No" : L"Yes");
         }
 
         wprintf(LINE);
-        set_default_encoding(stdout);
 
-        printf(
-            "Page: %d/%d\n"
-            "\n"
-            "1. Pilih buku\n"
-            "2. Urutkan buku\n"
-            "3. Halaman selanjutnya\n"
-            "4. Halaman sebelumnya\n"
-            "0. Kembali\n",
+        wprintf(
+            L"Page: %d/%d\n"
+            L"\n"
+            L"1. Pilih buku\n"
+            L"2. Urutkan buku\n"
+            L"3. Halaman selanjutnya\n"
+            L"4. Halaman sebelumnya\n"
+            L"0. Kembali\n",
             page, pack.maxpage);
 
         bool isvalid = true;
         do {
-            int choice = scan_number("Pilihan [0-4] >> ");
+            int choice = scan_number(L"Pilihan [0-4] >> ");
 
             int targetid = 0;
 
@@ -123,13 +115,13 @@ void __borrow_books(book_sort name, sort_type type) {
 
             switch (choice) {
                 case 1:
-                    targetid = scan_number("Masukkan ID buku [0 untuk kembali]: ");
+                    targetid = scan_number(L"Masukkan ID buku [0 untuk kembali]: ");
                     if (targetid == 0)
                         break;
 
                     targetidx = findbook(targetid);
                     if (targetidx == -1) {
-                        printf("Tidak dapat menemukan ID buku!\n");
+                        wprintf(L"Tidak dapat menemukan ID buku!\n");
                         await_enter();
                         return;
                     }
@@ -160,7 +152,7 @@ void __borrow_books(book_sort name, sort_type type) {
                 case 0:
                     return;
                 default:
-                    printf("Pilihan tidak dapat ditemukan!\n");
+                    wprintf(L"Pilihan tidak dapat ditemukan!\n");
                     isvalid = false;
                     break;
             }
@@ -177,13 +169,11 @@ void __return_borrowed_books() {
     do {
         clearscreen();
 
-        set_utf8_encoding(stdout);
         wprintf(
             L"╔════════════════════════════════════════════════╗\n"
             L"║               Mengembalikan Buku               ║\n"
             L"╚════════════════════════════════════════════════╝\n"
             L"\n");
-        set_default_encoding(stdout);
 
         bool res = show_borrowed_books();
         if (!res) {
@@ -191,7 +181,7 @@ void __return_borrowed_books() {
             return;
         }
 
-        int id = scan_number("\nMasukkan ID buku [0 untuk kembali]: ");
+        int id = scan_number(L"\nMasukkan ID buku [0 untuk kembali]: ");
         if (id == 0)
             return;
 
@@ -208,7 +198,7 @@ void __return_borrowed_books() {
         }
 
         if (uidx == -1) {
-            printf("Tidak dapat menemukan ID buku yang sedang dipinjam!\n");
+            wprintf(L"Tidak dapat menemukan ID buku yang sedang dipinjam!\n");
             await_enter();
             continue;
         }
@@ -219,7 +209,7 @@ void __return_borrowed_books() {
         break;
     } while (true);
 
-    bool ans = await_confirmation("Apakah anda yakin ingin mengembalikan buku ini?\n");
+    bool ans = await_confirmation(L"Apakah anda yakin ingin mengembalikan buku ini?\n");
     if (ans) {
         int start = uidx;
         int* bookids = CURRENT_USER->book_ids;
@@ -242,13 +232,13 @@ void __return_borrowed_books() {
         }
 
         target->duetime = 0;
-        strcpy(target->borrower, "-");
+        wcscpy(target->borrower, L"-");
         CURRENT_USER->book_count--;
 
         save_books();
         save_users();
 
-        printf("Buku telah dikembalikan!\n");
+        wprintf(L"Buku telah dikembalikan!\n");
     }
 
     await_enter();
@@ -260,25 +250,23 @@ void __return_borrowed_books() {
 void __change_password() {
     clearscreen();
 
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔════════════════════════════════════════════════╗\n"
         L"║                 Ganti Password                 ║\n"
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
-    set_default_encoding(stdout);
 
     user_t* current = CURRENT_USER;
-    char oldpass[MAXNAME_LENGTH], newpass[MAXNAME_LENGTH];
+    wchar_t oldpass[MAXNAME_LENGTH], newpass[MAXNAME_LENGTH];
 
     do {
-        printf("Masukkan password lama anda [0 untuk kembali]: ");
+        wprintf(L"Masukkan password lama anda [0 untuk kembali]: ");
         getpass(oldpass, MAXNAME_LENGTH);
 
-        if (strcmp(oldpass, "0") == 0)
+        if (wcscmp(oldpass, L"0") == 0)
             return;
-        if (strcmp(oldpass, current->password) != 0) {
-            printf("Password anda salah!\n");
+        if (wcscmp(oldpass, current->password) != 0) {
+            wprintf(L"Password anda salah!\n");
             continue;
         }
 
@@ -286,26 +274,26 @@ void __change_password() {
     } while (true);
 
     do {
-        printf("Masukkan password baru anda [0 untuk kembali]: ");
+        wprintf(L"Masukkan password baru anda [0 untuk kembali]: ");
         getpass(newpass, MAXNAME_LENGTH);
 
-        if (strcmp(newpass, "0") == 0)
+        if (wcscmp(newpass, L"0") == 0)
             return;
-        if (strcmp(newpass, oldpass) == 0) {
-            printf("Password baru anda tidak boleh sama dengan password lama anda!\n");
+        if (wcscmp(newpass, oldpass) == 0) {
+            wprintf(L"Password baru anda tidak boleh sama dengan password lama anda!\n");
             continue;
         }
 
-        if (strlen(newpass) < 5) {
-            printf("Password minimal terdiri dari 5 kata!\n");
+        if (wcslen(newpass) < 5) {
+            wprintf(L"Password minimal terdiri dari 5 kata!\n");
             continue;
         }
 
-        char* charchek_ptr = strpbrk(newpass, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        char* numcheck_ptr = strpbrk(newpass, "0123456789");
+        wchar_t* charchek_ptr = wcspbrk(newpass, L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        wchar_t* numcheck_ptr = wcspbrk(newpass, L"0123456789");
 
         if (charchek_ptr == NULL || numcheck_ptr == NULL) {
-            printf("Password harus terdiri dari huruf dan angka!\n");
+            wprintf(L"Password harus terdiri dari huruf dan angka!\n");
             continue;
         }
 
@@ -313,23 +301,23 @@ void __change_password() {
     } while (true);
 
     do {
-        char confirm[MAXNAME_LENGTH];
+        wchar_t confirm[MAXNAME_LENGTH];
 
-        printf("Konfirmasi password [0 untuk kembali]: ");
+        wprintf(L"Konfirmasi password [0 untuk kembali]: ");
         getpass(confirm, MAXNAME_LENGTH);
 
-        if (strcmp(confirm, "0") == 0)
+        if (wcscmp(confirm, L"0") == 0)
             return;
-        if (strcmp(newpass, confirm) != 0) {
-            printf("Password konfirmasi salah!\n");
+        if (wcscmp(newpass, confirm) != 0) {
+            wprintf(L"Password konfirmasi salah!\n");
             continue;
         }
 
         break;
     } while (true);
 
-    strcpy(current->password, newpass);
-    printf("Password berhasil diubah!\n");
+    wcscpy(current->password, newpass);
+    wprintf(L"Password berhasil diubah!\n");
 
     await_enter();
 }
@@ -344,33 +332,33 @@ void __read_book() {
     }
 
     book_t* current = NULL;
-    printf(
-        "NOTE: Anda dapat mengisi '0' untuk keluar dari menu ini!\n"
-        "\n");
+    wprintf(
+        L"NOTE: Anda dapat mengisi '0' untuk keluar dari menu ini!\n"
+        L"\n");
 
     while (true) {
         if (current == NULL) {
-            int id = scan_number("Masukkan ID buku yang ingin dibaca: ");
+            int id = scan_number(L"Masukkan ID buku yang ingin dibaca: ");
 
             if (id == 0)
                 return;
             if (id < 1)
-                printf("ID buku tidak valid!\n");
+               wprintf(L"ID buku tidak valid!\n");
 
             int idx = findbook(id);
             if (idx == -1)
-                printf("Tidak dapat menemukan buku dengan ID ini!\n");
+                wprintf(L"Tidak dapat menemukan buku dengan ID ini!\n");
 
             current = &BOOK_LIST[idx];
         }
 
         clearscreen();
-        printf(
-            "NOTE: Anda dapat mengisi '0' untuk keluar dari menu ini!\n"
-            "\n");
+        wprintf(
+            L"NOTE: Anda dapat mengisi '0' untuk keluar dari menu ini!\n"
+            L"\n");
 
 
-        printf("Masukkan halaman yang ingin dibaca [1-%d]: ", current->pages);
+        wprintf(L"Masukkan halaman yang ingin dibaca [1-%d]: ", current->pages);
         int page = scan_number(NULL);
         if (page == 0)
             return;
@@ -384,7 +372,6 @@ void __read_book() {
 void showuser_menu() {
     clearscreen();
 
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔════════════════════════════════════════════════╗\n"
         L"║                   USER  MENU                   ║\n"
@@ -400,11 +387,10 @@ void showuser_menu() {
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
 
-    set_default_encoding(stdout);
     bool isvalid = true;
 
     do {
-        int choice = scan_number("Pilihan [0-4] >> ");
+        int choice = scan_number(L"Pilihan [0-4] >> ");
         switch (choice) {
             case 1:
                 __borrow_books(ID_SORT, ASCENDING);
@@ -426,7 +412,7 @@ void showuser_menu() {
                 CURRENT_USER = NULL;
                 break;
             default:
-                printf("Pilihan tidak dapat ditemukan!\n");
+                wprintf(L"Pilihan tidak dapat ditemukan!\n");
                 isvalid = false;
                 break;
         }

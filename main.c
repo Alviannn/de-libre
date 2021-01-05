@@ -3,10 +3,18 @@
 #include "menu/login.h"
 #include "menu/user.h"
 
+/**
+ * todo:
+ *  - Improve admin adding book tutorial
+ *  - Fix adding book can have empty values  
+ */
 int main() {
     // digunakan untuk format angka
     // misal: 100000 -> 100,000
     setlocale(LC_NUMERIC, "");
+    
+    set_utf8_encoding(stdout);
+    set_utf8_encoding(stdin);
 
     USER_LIST = malloc(sizeof(user_t));
     BOOK_LIST = malloc(sizeof(book_t));
@@ -16,8 +24,8 @@ int main() {
     load_books();
     load_users();
 
-    if (finduser("admin") == -1) {
-        createuser("admin", "admin", true, NULL, 0);
+    if (finduser(L"admin") == -1) {
+        createuser(L"admin", L"admin", true, NULL, 0);
         save_users();
     }
 

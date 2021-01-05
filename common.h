@@ -52,9 +52,9 @@
 
 typedef struct user_t {
     /** Username user */
-    char name[MAXNAME_LENGTH];
+    wchar_t name[MAXNAME_LENGTH];
     /** password user */
-    char password[MAXNAME_LENGTH];
+    wchar_t password[MAXNAME_LENGTH];
     /** Menentukan apakah user ini seorang admin atau member */
     bool isadmin;
     /** Banyak buku yg dipinjam user */
@@ -67,13 +67,13 @@ typedef struct book_t {
     /** ID buku */
     int id;
     /** judul buku */
-    char title[MAXNAME_LENGTH];
+    wchar_t title[MAXNAME_LENGTH];
     /** penulis buku */
-    char author[MAXNAME_LENGTH];
+    wchar_t author[MAXNAME_LENGTH];
     /** jumlah halaman buku */
     int pages;
     /** Username peminjaman buku */
-    char borrower[MAXNAME_LENGTH];
+    wchar_t borrower[MAXNAME_LENGTH];
     /** Jatuh tempo peminjaman buku */
     time_t duetime;
 } book_t;
@@ -151,7 +151,7 @@ void* book_comparator(sort_type type);
  * @param book_count banyak buku yg dipinjam
  * @return index dimana struct user ini berada
  */
-int createuser(char name[], char password[], bool isadmin, int* book_ids, int book_count);
+int createuser(wchar_t name[], wchar_t password[], bool isadmin, int* book_ids, int book_count);
 
 /**
  * @brief Membuat sebuah data struct buku, dan juga menambahkan buku tersebut ke dalam database buku
@@ -164,7 +164,7 @@ int createuser(char name[], char password[], bool isadmin, int* book_ids, int bo
  * @param duetime  jatuh tempo peminjaman buku
  * @return index dimana struct buku ini berada
  */
-int createbook(int id, char title[], char author[], int pages, char* borrower, time_t duetime);
+int createbook(int id, wchar_t title[], wchar_t author[], int pages, wchar_t* borrower, time_t duetime);
 
 /**
  * @brief Menghapus buku dari database buku berdasarkan ID buku
@@ -185,7 +185,7 @@ bool isbook_borrowed(book_t book);
  * @param name username yang dicari
  * @return Index user yang dicari, tetapi akan return -1 jika user tidak dapat ditemukan
  */
-int finduser(char name[]);
+int finduser(wchar_t name[]);
 
 /**
  * @brief Mencari sebuah buku berdasarkan ID buku (dengan menggunakan metode binary search)
@@ -201,7 +201,7 @@ int findbook(int id);
  * @param title judul buku yang dicari
  * @return index buku yang dicari, tetapi akan return -1 jika buku tidak dapat ditemukan
  */
-int findbook_title(char title[]);
+int findbook_title(wchar_t title[]);
 
 /**
  * @brief Membuat halaman (maks. 10 elemen per halaman)
@@ -242,7 +242,7 @@ int select_sorttype();
  * @param message pesan yang akan dikirimkan kepada user
  * @return true jika mendapatkan jawaban Iya, false jika Tidak
  */
-bool await_confirmation(char* message);
+bool await_confirmation(wchar_t* message);
 
 /**
  * @brief Meyimpan database buku

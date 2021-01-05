@@ -28,7 +28,7 @@ void clearscreen();
  * @param message pesan sebelum input (contoh: "Masukkan angka: ")
  * @return angka yang didapatkan dari input
  */
-double scan_number(char* message);
+double scan_number(wchar_t* message);
 
 /**
 * @brief Mengambil string atau text lengkap dari input
@@ -37,7 +37,7 @@ double scan_number(char* message);
 * @param dest    string yang dituju
 * @param size    panjang string
 */
-void scan_string(char* message, char* dest, size_t size);
+void scan_string(wchar_t* message, wchar_t* dest, size_t size);
 
 /**
  * @brief Membaca string dari input seperti membaca password (tidak di echo hasil ketikannya)
@@ -45,7 +45,7 @@ void scan_string(char* message, char* dest, size_t size);
  * @param dest string yang dituju
  * @param size panjang string
  */
-void getpass(char* dest, size_t size);
+void getpass(wchar_t* dest, size_t size);
 
 /**
  * @brief Mengalokasikan sebuah memory dengan aman,

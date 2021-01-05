@@ -7,8 +7,8 @@
 #define NULL_KEY 0
 
 void await_enter() {
-    printf("Tekan enter untuk lanjut...");
-    getchar();
+    wprintf(L"Tekan enter untuk lanjut...");
+    getwchar();
     fflush(stdin);
 }
 
@@ -28,51 +28,51 @@ void clearscreen() {
 #endif
 }
 
-double scan_number(char* message) {
+double scan_number(wchar_t* message) {
     double input = 0;
     int scanresult = 0;
 
     do {
         if (message != NULL)
-            printf(message);
+            wprintf(message);
 
-        scanresult = scanf("%lf", &input);
+        scanresult = wscanf(L"%lf", &input);
         fflush(stdin);
 
         if (scanresult != 0)
             break;
 
-        printf("Input ini hanya dapat menerima angka!\n");
+        wprintf(L"Input ini hanya dapat menerima angka!\n");
     } while (1);
 
     return input;
 }
 
-void scan_string(char* message, char* dest, size_t size) {
+void scan_string(wchar_t* message, wchar_t* dest, size_t size) {
     if (message != NULL)
-        printf(message);
+        wprintf(message);
 
-    fgets(dest, size, stdin);
-    if (dest[strlen(dest) - 1] == '\n')
-        dest[strlen(dest) - 1] = 0;
+    fgetws(dest, size, stdin);
+    if (dest[wcslen(dest) - 1] == '\n')
+        dest[wcslen(dest) - 1] = 0;
 
     fflush(stdin);
 }
 
-void getpass(char* dest, size_t size) {
-    char key = 0;
+void getpass(wchar_t* dest, size_t size) {
+    wchar_t key = 0;
 
     size_t count = 0;
     memset(dest, 0, size);
 
     // selagi key yg terbaca bukan 'enter' key, lanjutnya input scanningnya
-    while ((key = _getch()) != ENTER_KEY) {
+    while ((key = _getwch()) != ENTER_KEY) {
         // melakukan apa yg seharusnya 'backspace' key lakukan
         // ya... ngedelete character per character
         if (key == BACKSPACE_KEY && count != 0) {
             count--;
             dest[count] = 0;
-            printf("\b \b");
+            wprintf(L"\b \b");
             continue;
         }
 
@@ -83,7 +83,7 @@ void getpass(char* dest, size_t size) {
 
             size_t i = 0;
             for (i = 0; i < count; i++)
-                printf("\b \b");
+                wprintf(L"\b \b");
 
             count = 0;
             continue;
@@ -95,7 +95,7 @@ void getpass(char* dest, size_t size) {
         // jika user menekan arrow key, skip
         if (key == NULL_KEY) {
             // arrow key ada 2 inputnya
-            _getch();
+            _getwch();
             continue;
         }
         // jika key yg ditekan invalid (tidak diketahui arti ASCII-nya) atau melebihi kapasitas string
@@ -105,10 +105,10 @@ void getpass(char* dest, size_t size) {
 
         dest[count] = key;
         count++;
-        printf("*");
+        wprintf(L"*");
     }
 
-    printf("\n");
+    wprintf(L"\n");
 }
 
 void* safe_alloc(void* mem, size_t num_elems, size_t elem_size) {
@@ -131,10 +131,10 @@ void* safe_alloc(void* mem, size_t num_elems, size_t elem_size) {
     // jika proses alokasi memory gagal, maka kita akan hentikan program
     // karena kegagalan ini hanya bisa terjadi karena tidak memiliki memory
     if (tmp == NULL) {
-        printf(
-            "\n"
-            "Error: Failed to reallocate memory for %p!\n"
-            "       This is most likely caused because there's no memory available!\n",
+        wprintf(
+            L"\n"
+            L"Error: Failed to reallocate memory for %p!\n"
+            L"       This is most likely caused because there's no memory available!\n",
             mem);
 
         free(mem);

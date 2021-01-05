@@ -20,9 +20,9 @@ int comparebook_asc(const book_t* a, const book_t* b) {
         case ID_SORT:
             return a->id - b->id;
         case TITLE_SORT:
-            return strcmp(a->title, b->title);
+            return wcscmp(a->title, b->title);
         case AUTHOR_SORT:
-            return strcmp(a->author, b->author);
+            return wcscmp(a->author, b->author);
         case PAGES_SORT:
             return a->pages - b->pages;
         case AVAILABILITY_SORT:
@@ -40,7 +40,7 @@ int comparebook_desc(const book_t* a, const book_t* b) {
 }
 
 int compareuser(const user_t* a, const user_t* b) {
-    return strcmp(a->name, b->name);
+    return wcscmp(a->name, b->name);
 }
 
 // -                                                     - //
@@ -54,11 +54,11 @@ void* book_comparator(sort_type type) {
         return comparebook_desc;
 }
 
-int createuser(char name[], char password[], bool isadmin, int* book_ids, int book_count) {
+int createuser(wchar_t name[], wchar_t password[], bool isadmin, int* book_ids, int book_count) {
     user_t user;
 
-    strcpy(user.name, name);
-    strcpy(user.password, password);
+    wcscpy(user.name, name);
+    wcscpy(user.password, password);
     user.isadmin = isadmin;
 
     // Membersihkan bytes/memory pada array book_ids
@@ -79,14 +79,14 @@ int createuser(char name[], char password[], bool isadmin, int* book_ids, int bo
     return ULENGTH - 1;
 }
 
-int createbook(int id, char title[], char author[], int pages, char* borrower, time_t duetime) {
+int createbook(int id, wchar_t title[], wchar_t author[], int pages, wchar_t* borrower, time_t duetime) {
     book_t book;
 
-    strcpy(book.title, title);
-    strcpy(book.author, author);
+    wcscpy(book.title, title);
+    wcscpy(book.author, author);
 
-    if (borrower != NULL && strlen(borrower) != 0)
-        strcpy(book.borrower, borrower);
+    if (borrower != NULL && wcslen(borrower) != 0)
+        wcscpy(book.borrower, borrower);
 
     book.id = id;
     book.pages = pages;
@@ -102,19 +102,19 @@ int createbook(int id, char title[], char author[], int pages, char* borrower, t
 
 bool removebook(int id) {
     if (id <= 0) {
-        printf("Buku ini tidak dapat ditemukan\n");
+        wprintf(L"Buku ini tidak dapat ditemukan\n");
         return false;
     }
 
     int idx = findbook(id);
     if (idx == -1) {
-        printf("Buku ini tidak dapat ditemukan\n");
+        wprintf(L"Buku ini tidak dapat ditemukan\n");
         return false;
     }
 
     book_t* found = &BOOK_LIST[idx];
     if (isbook_borrowed(*found)) {
-        printf("Buku yang sedang dipinjam tidak dapat dihapus!\n");
+        wprintf(L"Buku yang sedang dipinjam tidak dapat dihapus!\n");
         return false;
     }
 
@@ -128,16 +128,16 @@ bool removebook(int id) {
 
     BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
 
-    printf("Buku berhasil dihapuskan dari database!\n");
+    wprintf(L"Buku berhasil dihapuskan dari database!\n");
     save_books();
     return true;
 }
 
 bool isbook_borrowed(book_t book) {
-    return strlen(book.borrower) != 0 && strcmp(book.borrower, "-") != 0 && book.duetime != 0;
+    return wcslen(book.borrower) != 0 && wcscmp(book.borrower, L"-") != 0 && book.duetime != 0;
 }
 
-int finduser(char name[]) {
+int finduser(wchar_t name[]) {
     int left = 0;
     int right = ULENGTH - 1;
     int mid = 0;
@@ -148,7 +148,7 @@ int finduser(char name[]) {
         mid = (left + right) / 2;
         user_t* temp = &USER_LIST[mid];
 
-        int compare = strcmp(name, temp->name);
+        int compare = wcscmp(name, temp->name);
         if (compare == 0)
             return mid;
 
@@ -188,7 +188,7 @@ int findbook(int id) {
     return -1;
 }
 
-int findbook_title(char title[]) {
+int findbook_title(wchar_t title[]) {
     book_sort before = MAIN_BOOK_SORT;
     MAIN_BOOK_SORT = TITLE_SORT;
 
@@ -203,7 +203,7 @@ int findbook_title(char title[]) {
         mid = (left + right) / 2;
         book_t* temp = &BOOK_LIST[mid];
 
-        int compare = strcmp(title, temp->title);
+        int compare = wcscmp(title, temp->title);
         if (compare == 0)
             return mid;
 
@@ -253,31 +253,25 @@ bookpaginate_t book_paginate(book_t* arr, int length, book_sort name, sort_type 
 
 void view_book(book_t* book) {
     clearscreen();
-
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔══════════════════════════════════════════════════════╗\n"
         L"║                     Detail  Buku                     ║\n"
         L"╠══════════════════════════════════════════════════════╣\n"
         L"║                                                      ║\n"
-        L"║ · Judul   : %-40s ║\n"
-        L"║ · Penulis : %-40s ║\n"
+        L"║ · Judul   : %-40ls ║\n"
+        L"║ · Penulis : %-40ls ║\n"
         L"║ · Halaman : %-40d ║\n"
-        L"║ · Tersedia: %-40s ║\n"
+        L"║ · Tersedia: %-40ls ║\n"
         L"║                                                      ║\n"
         L"╚══════════════════════════════════════════════════════╝\n",
         book->title,
         book->author,
         book->pages,
-        isbook_borrowed(*book) ? "No" : "Yes");
-
-    set_default_encoding(stdout);
+        isbook_borrowed(*book) ? L"No" : L"Yes");
 }
 
 int select_booksort() {
     clearscreen();
-
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔════════════════════════════════════════════════╗\n"
         L"║                  URUTAN  BUKU                  ║\n"
@@ -293,17 +287,15 @@ int select_booksort() {
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
 
-    set_default_encoding(stdout);
     bool isvalid = true;
-
     do {
-        int choice = scan_number("Pilihan [0-5] >> ");
+        int choice = scan_number(L"Pilihan [0-5] >> ");
 
         if (choice >= 0 && choice <= 5) {
             return choice - 1;
         } else {
             isvalid = false;
-            printf("Pilihan tidak dapat ditemukan!\n");
+            wprintf(L"Pilihan tidak dapat ditemukan!\n");
         }
     } while (!isvalid);
 
@@ -312,8 +304,6 @@ int select_booksort() {
 
 int select_sorttype() {
     clearscreen();
-
-    set_utf8_encoding(stdout);
     wprintf(
         L"╔════════════════════════════════════════════════╗\n"
         L"║                TIPE  PENGURUTAN                ║\n"
@@ -326,50 +316,49 @@ int select_sorttype() {
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
 
-    set_default_encoding(stdout);
     bool isvalid = true;
 
     do {
-        int choice = scan_number("Pilihan [0-2] >> ");
+        int choice = scan_number(L"Pilihan [0-2] >> ");
 
         if (choice >= 0 && choice <= 2) {
             return choice - 1;
         } else {
             isvalid = false;
-            printf("Pilihan tidak dapat ditemukan!\n");
+            wprintf(L"Pilihan tidak dapat ditemukan!\n");
         }
     } while (!isvalid);
 
     return -1;
 }
 
-bool await_confirmation(char* message) {
-    if (message == NULL || strlen(message) == 0) {
-        printf("Gagal dalam membuat konfirmasi!\n");
+bool await_confirmation(wchar_t* message) {
+    if (message == NULL || wcslen(message) == 0) {
+        wprintf(L"Gagal dalam membuat konfirmasi!\n");
         return false;
     }
 
-    printf(
-        "%s"
-        "\n"
-        "(Y) Ya\n"
-        "(N) Tidak\n", message);
+    wprintf(
+        L"%ls"
+        L"\n"
+        L"(Y) Ya\n"
+        L"(N) Tidak\n", message);
 
-    char answer = 0;
+    wchar_t answer;
     do {
-        printf(">> ");
-        answer = toupper(getchar());
+        wprintf(L">> ");
+        answer = towupper(getwchar());
         fflush(stdin);
 
-        if (answer != 'Y' && answer != 'N') {
-            printf("Pilihan tidak valid!\n");
+        if (answer != L'Y' && answer != L'N') {
+            wprintf(L"Pilihan tidak valid!\n");
             continue;
         }
 
         break;
     } while (true);
 
-    return answer == 'Y';
+    return answer == L'Y';
 }
 
 void save_books() {
@@ -381,12 +370,12 @@ void save_books() {
 
     size_t i = 0;
     for (i = 0; i < BLENGTH; i++) {
-        book_t tmp = BOOK_LIST[i];
+        book_t* tmp = &BOOK_LIST[i];
 
         int buf = FILENAME_MAX + strlen(BOOK_DATABASE_PATH);
 
         char path[buf];
-        sprintf(path, BOOK_DATABASE_PATH "/%d", tmp.id);
+        sprintf(path, BOOK_DATABASE_PATH "/%d", tmp->id);
         mkdir(path);
 
         buf += 13;
@@ -398,8 +387,10 @@ void save_books() {
         strcat(metadata, "metadata.txt");
 
         FILE* curfile = fopen(metadata, "w");
-        fprintf(curfile, "%d;%s;%s;%d;%s;%lld\n",
-                tmp.id, tmp.title, tmp.author, tmp.pages, tmp.borrower, tmp.duetime);
+        set_utf8_encoding(curfile);
+
+        fwprintf(curfile, L"%d;%ls;%ls;%d;%ls;%lld\n",
+                tmp->id, tmp->title, tmp->author, tmp->pages, tmp->borrower, tmp->duetime);
         fclose(curfile);
     }
 }
@@ -436,14 +427,16 @@ void load_books() {
         sprintf(metadatapath, BOOK_DATABASE_PATH "/%d/metadata.txt", rawid);
 
         int id, pages;
-        char title[MAXNAME_LENGTH],
+        wchar_t title[MAXNAME_LENGTH],
             author[MAXNAME_LENGTH],
             borrower[MAXNAME_LENGTH];
         time_t duetime;
 
         FILE* file = fopen(metadatapath, "r");
+        set_utf8_encoding(file);
+
         if (file != NULL) {
-            fscanf(file, "%d;%[^;];%[^;];%d;%[^;];%lld", &id, title, author, &pages, borrower, &duetime);
+            fwscanf(file, L"%d;%l[^;];%l[^;];%d;%l[^;];%lld", &id, title, author, &pages, borrower, &duetime);
             fclose(file);
             createbook(id, title, author, pages, borrower, duetime);
         }
@@ -454,21 +447,24 @@ void load_books() {
 
 void save_users() {
     FILE* file = fopen(USER_DATABASE_PATH, "w");
+    set_utf8_encoding(file);
 
     size_t i = 0, j = 0;
     for (i = 0; i < ULENGTH; i++) {
-        user_t tmp = USER_LIST[i];
+        user_t* tmp = &USER_LIST[i];
 
-        char borrowed[101 + 11] = "";
+        wchar_t borrowed[101 + 11];
+        wcscpy(borrowed, L"");
+
         for (j = 0; j < MAX_BORROW; j++) {
-            char intstr[11] = "";
+            wchar_t intstr[11];
 
-            sprintf(intstr, ";%d", tmp.book_ids[j]);
-            strcat(borrowed, intstr);
+            swprintf(intstr, 12, L";%d", tmp->book_ids[j]);
+            wcscat(borrowed, intstr);
         }
 
-        strcat(borrowed, "\n");
-        fprintf(file, "%s;%s;%d;%d%s", tmp.name, tmp.password, tmp.isadmin, tmp.book_count, borrowed);
+        wcscat(borrowed, L"\n");
+        fwprintf(file, L"%ls;%ls;%d;%d%ls", tmp->name, tmp->password, tmp->isadmin, tmp->book_count, borrowed);
     }
 
     fclose(file);
@@ -476,28 +472,29 @@ void save_users() {
 
 void load_users() {
     FILE* file = fopen(USER_DATABASE_PATH, "r");
+    set_utf8_encoding(file);
+
     while (!feof(file)) {
-        char name[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
+        wchar_t name[MAXNAME_LENGTH], password[MAXNAME_LENGTH];
         int book_count, book_ids[MAX_BORROW];
         int isadmin;
 
-        char tmp[101 + 11];
+        wchar_t tmp[101 + 11];
 
-        int scanres = fscanf(file, "%[^;];%[^;];%d;%d;%[^\n]", name, password, &isadmin, &book_count, tmp);
+        int scanres = fwscanf(file, L"%l[^;];%l[^;];%d;%d;%l[^\n]", name, password, &isadmin, &book_count, tmp);
         if (scanres == EOF || fgetc(file) == EOF)
             break;
 
         int idx = 0;
-        char* token = strtok(tmp, ";");
+        wchar_t* token = wcstok(tmp, L";");
 
         while (token != NULL) {
-            int bookid = atoi(token);
+            int bookid = _wtoi(token);
             book_ids[idx++] = bookid;
 
-            token = strtok(NULL, ";");
+            token = wcstok(NULL, L";");
         }
 
-        printf("%s is created\n", name);
         createuser(name, password, isadmin, book_ids, book_count);
     }
 
@@ -508,15 +505,15 @@ bool readbook(book_t* current, int page) {
     clearscreen();
 
     if (!isbook_borrowed(*current)) {
-        printf("Anda sedang tidak meminjam buku ini!\n");
+        wprintf(L"Anda sedang tidak meminjam buku ini!\n");
         return false;
     }
-    if (strcmp(current->borrower, CURRENT_USER->name) != 0) {
-        printf("Anda bukanlah orang yang meminjam buku ini!\n");
+    if (wcscmp(current->borrower, CURRENT_USER->name) != 0) {
+        wprintf(L"Anda bukanlah orang yang meminjam buku ini!\n");
         return false;
     }
     if (page > current->pages) {
-        printf("Buku ini hanya terdapat %d halaman!\n", current->pages);
+        wprintf(L"Buku ini hanya terdapat %d halaman!\n", current->pages);
         return false;
     }
 
@@ -524,23 +521,25 @@ bool readbook(book_t* current, int page) {
     sprintf(path, BOOK_DATABASE_PATH "/%d/%d.txt", current->id, page);
 
     FILE* file = fopen(path, "r");
+    set_utf8_encoding(file);
+
     if (file == NULL) {
-        printf("Tidak dapat menemukan halaman %d pada buku!\n", page);
+        wprintf(L"Tidak dapat menemukan halaman %d pada buku!\n", page);
         return false;
     }
 
-    char line[257] = "";
-    while (fgets(line, 257, file) != NULL)
-        printf("%s", line);
+    wchar_t line[257];
+    while (fgetws(line, 257, file) != NULL)
+        wprintf(line);
     fclose(file);
 
-    printf(
-        "\n"
-        "\n"
-        "Halaman: %d/%d\n"
-        "Tekan 'enter' untuk selesai membaca...\n", page, current->pages);
+    wprintf(
+        L"\n"
+        L"\n"
+        L"Halaman: %d/%d\n"
+        L"Tekan 'enter' untuk selesai membaca...\n", page, current->pages);
 
-    getchar();
+    getwchar();
     fflush(stdin);
     return true;
 }
@@ -555,39 +554,34 @@ bool show_borrowed_books() {
 
     int total = CURRENT_USER->book_count;
     if (total == 0) {
-        printf("Anda sedang tidak meminjam buku apapun!\n");
+        wprintf(L"Anda sedang tidak meminjam buku apapun!\n");
         return false;
     }
 
     MAIN_BOOK_SORT = ID_SORT;
     quicksort_book(BOOK_LIST, BLENGTH, book_comparator(ASCENDING));
 
-    set_utf8_encoding(stdout);
     wchar_t LINE[108];
     wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
 
     wprintf(LINE);
-    wprintf(L"│ %-3s │ %-40s │ %-40s │ %-10s │\n", "ID", "Judul", "Penulis", "Due Date");
+    wprintf(L"│ %-3ls │ %-40ls │ %-40ls │ %-10ls │\n", L"ID", L"Judul", L"Penulis", L"Due Date");
     wprintf(LINE);
 
     int i = 0;
     for (i = 0; i < total; i++) {
-        set_default_encoding(stdout);
         int idx = findbook(CURRENT_USER->book_ids[i]);
 
         book_t* tmp = &BOOK_LIST[idx];
         struct tm* ltm = localtime(&tmp->duetime);
 
-        char duedate[] = "dd-MM-yyyy";
-        sprintf(duedate, "%02d-%02d-%d", ltm->tm_mday, ltm->tm_mon + 1, ltm->tm_year + 1900);
-        strftime(duedate, strlen(duedate) + 1, "%d-%m-%Y", ltm);
+        wchar_t duedate[11];
+        swprintf(duedate, 11, L"%02d-%02d-%d", ltm->tm_mday, ltm->tm_mon + 1, ltm->tm_year + 1900);
+        wcsftime(duedate, 11, L"%d-%m-%Y", ltm);
 
-        set_utf8_encoding(stdout);
-        wprintf(L"│ %-3d │ %-40s │ %-40s │ %-10s │\n", tmp->id, tmp->title, tmp->author, duedate);
+        wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-10ls │\n", tmp->id, tmp->title, tmp->author, duedate);
     }
 
     wprintf(LINE);
-    set_default_encoding(stdout);
-
     return true;
 }
