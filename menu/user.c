@@ -92,7 +92,7 @@ void __borrow_books(book_sort name, sort_type type) {
         for (i = 0; i < (int)pack.len; i++) {
             book_t* tmp = &pack.list[i];
 
-            wprintf(L"│ %-3u │ %-40s │ %-40s │ %-7u │ %-8s │\n",
+            wprintf(L"│ %-3d │ %-40s │ %-40s │ %-7u │ %-8s │\n",
                     tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? "No" : "Yes");
         }
 
