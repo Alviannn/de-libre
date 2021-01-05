@@ -266,7 +266,6 @@ void __view_books() {
                     page--;
                     break;
                 case 0:
-                    CURRENT_USER = NULL;
                     return;
                 default:
                     printf("Pilihan tidak dapat ditemukan!\n");
@@ -342,6 +341,7 @@ void showadmin_menu() {
                 __view_users();
                 break;
             case 0:
+                CURRENT_USER = NULL;
                 break;
             default:
                 isvalid = false;
