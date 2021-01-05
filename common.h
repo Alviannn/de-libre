@@ -12,7 +12,6 @@
 #include <conio.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <fcntl.h>
 #include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -41,6 +40,11 @@
 #define BOOK_DATABASE_PATH DATABASE_PATH "/BOOK_DB"
 // Alamat file database user
 #define USER_DATABASE_PATH DATABASE_PATH "/user_db.txt"
+
+// UTF-8 encoding category
+#define UTF8_ENCODING 0x40000
+// Default encoding category
+#define DEFAULT_ENCODING 0x4000
 
 // -                                                   - //
 // ---------------------- Structs ---------------------- //

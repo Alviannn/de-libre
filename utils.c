@@ -147,11 +147,11 @@ void* safe_alloc(void* mem, size_t num_elems, size_t elem_size) {
 }
 
 void set_utf8_encoding(FILE* file) {
-    _setmode(_fileno(file), _O_U8TEXT);
+    _setmode(_fileno(file), UTF8_ENCODING);
 }
 
 void set_default_encoding(FILE* file) {
-    _setmode(_fileno(file), _O_TEXT);
+    _setmode(_fileno(file), DEFAULT_ENCODING);
 }
 
 // -                                                     - //
