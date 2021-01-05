@@ -171,18 +171,19 @@ void __exit_program() {
           L"╚════════════════════════════════════════════════╝\n");
 
     int count = 0;
+    int i = 0, j = 0;
 
-    for (int i = 0; i < 19; i++) {
-        for (int j = 0; j < 51; j++)
+    for (i = 0; i < 19; i++) {
+        for (j = 0; j < 51; j++)
             wprintf(L"%lc", msg[count++]);
 
         sleep(50);
     }
     
     wprintf(L"\n");
-
     set_default_encoding(stdout);
 
+    await_enter();
     exit(EXIT_SUCCESS);
 }
 

@@ -16,7 +16,8 @@ void __add_book() {
     if (total == 0)
         return;
 
-    for (int i = 0; i < total; i++) {
+    int i = 0;
+    for (i = 0; i < total; i++) {
         printf(
             "Buku ke-%d\n"
             "\n",
@@ -95,7 +96,8 @@ void __remove_book() {
         wprintf(L"│ %-3s │ %-40s │ %-40s │ %-7s │ %-8s │\n", "ID", "Judul", "Penulis", "Halaman", "Tersedia");
         wprintf(LINE);
 
-        for (int i = 0; i < pack.len; i++) {
+        int i = 0;
+        for (i = 0; i < pack.len; i++) {
             book_t* tmp = &pack.list[i];
 
             wprintf(L"│ %-3d │ %-40s │ %-40s │ %-7d │ %-8s │\n",
@@ -194,7 +196,8 @@ void __view_books() {
         wprintf(L"│ %-3s │ %-40s │ %-40s │ %-7s │ %-8s │\n", "ID", "Judul", "Penulis", "Halaman", "Tersedia");
         wprintf(LINE);
 
-        for (int i = 0; i < pack.len; i++) {
+        int i = 0;
+        for (i = 0; i < pack.len; i++) {
             book_t* tmp = &pack.list[i];
 
             wprintf(L"│ %-3d │ %-40s │ %-40s │ %-7d │ %-8s │\n",
@@ -291,7 +294,8 @@ void __view_users() {
     wprintf(L"│ %-3s │ %-40s │ %-5s │\n", "No.", "Username", "Admin");
     wprintf(line);
 
-    for (size_t i = 0; i < ULENGTH; i++) {
+    size_t i = 0;
+    for (i = 0; i < ULENGTH; i++) {
         user_t* tmp = &USER_LIST[i];
         wprintf(L"│ %-3llu │ %-40s │ %-5s │\n", i + 1, tmp->name, (tmp->isadmin ? "Yes" : "No"));
     }

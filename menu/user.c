@@ -88,7 +88,8 @@ void __borrow_books(book_sort name, sort_type type) {
         wprintf(L"│ %-3s │ %-40s │ %-40s │ %-7s │ %-8s │\n", "ID", "Judul", "Penulis", "Halaman", "Tersedia");
         wprintf(LINE);
 
-        for (int i = 0; i < (int)pack.len; i++) {
+        int i = 0;
+        for (i = 0; i < (int)pack.len; i++) {
             book_t* tmp = &pack.list[i];
 
             wprintf(L"│ %-3u │ %-40s │ %-40s │ %-7u │ %-8s │\n",
@@ -196,7 +197,8 @@ void __return_borrowed_books() {
 
         // does linear search
         // because 10 is the max amount, so no worries
-        for (int i = 0; i < bookcount; i++) {
+        int i = 0;
+        for (i = 0; i < bookcount; i++) {
             int tmpid = CURRENT_USER->book_ids[i];
 
             if (id == tmpid) {

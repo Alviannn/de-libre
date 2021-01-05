@@ -80,8 +80,11 @@ void getpass(char* dest, size_t size) {
         // apa yang sudah tertulis akan terhapuskan
         if (key == ESC_KEY) {
             memset(dest, 0, size);
-            for (size_t i = 0; i < count; i++)
+
+            size_t i = 0;
+            for (i = 0; i < count; i++)
                 printf("\b \b");
+
             count = 0;
             continue;
         }
@@ -159,7 +162,8 @@ ll __partition_user(user_t* base, ll low, ll high, cmpfunc_user_t __cmpfunc) {
     user_t* pivot = &base[high];
     ll idx = (low - 1);
 
-    for (ll i = low; i <= high - 1; i++) {
+    ll i = 0;
+    for (i = low; i <= high - 1; i++) {
         user_t* a = &base[i];
 
         if (__cmpfunc(pivot, a) > 0) {
@@ -204,7 +208,8 @@ ll __partition_book(book_t* base, ll low, ll high, cmpfunc_book_t __cmpfunc) {
     book_t* pivot = &base[high];
     ll idx = (low - 1);
 
-    for (ll i = low; i <= high - 1; i++) {
+    ll i = 0;
+    for (i = low; i <= high - 1; i++) {
         book_t* a = &base[i];
         if (__cmpfunc(pivot, a) > 0) {
             idx++;

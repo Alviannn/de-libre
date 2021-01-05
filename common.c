@@ -379,7 +379,8 @@ void save_books() {
     fprintf(lastidfile, "%d\n", LAST_BOOK_ID);
     fclose(lastidfile);
 
-    for (size_t i = 0; i < BLENGTH; i++) {
+    size_t i = 0;
+    for (i = 0; i < BLENGTH; i++) {
         book_t tmp = BOOK_LIST[i];
 
         int buf = FILENAME_MAX + strlen(BOOK_DATABASE_PATH);
@@ -454,18 +455,19 @@ void load_books() {
 void save_users() {
     FILE* file = fopen(USER_DATABASE_PATH, "w");
 
-    for (size_t i = 0; i < ULENGTH; i++) {
+    size_t i = 0, j = 0;
+    for (i = 0; i < ULENGTH; i++) {
         user_t tmp = USER_LIST[i];
 
         char borrowed[101 + 11] = "";
-        for (size_t j = 0; j < MAX_BORROW; j++) {
+        for (j = 0; j < MAX_BORROW; j++) {
             char intstr[11] = "";
 
             sprintf(intstr, ";%d", tmp.book_ids[j]);
             strcat(borrowed, intstr);
         }
-        strcat(borrowed, "\n");
 
+        strcat(borrowed, "\n");
         fprintf(file, "%s;%s;%d;%d%s", tmp.name, tmp.password, tmp.isadmin, tmp.book_count, borrowed);
     }
 
@@ -568,7 +570,8 @@ bool show_borrowed_books() {
     wprintf(L"│ %-3s │ %-40s │ %-40s │ %-10s │\n", "ID", "Judul", "Penulis", "Due Date");
     wprintf(LINE);
 
-    for (int i = 0; i < total; i++) {
+    int i = 0;
+    for (i = 0; i < total; i++) {
         set_default_encoding(stdout);
         int idx = findbook(CURRENT_USER->book_ids[i]);
 
