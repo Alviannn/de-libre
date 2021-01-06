@@ -133,6 +133,7 @@ bool removebook(int id) {
 
     wprintf(L"Buku berhasil dihapuskan dari database!\n");
     save_books();
+    
     return true;
 }
 
@@ -727,9 +728,22 @@ void showbooks(wchar_t* header, void (*on_select)(book_t* target)) {
                     break;
                 case 3:
                     page++;
+
+                    if (page > pack.maxpage) {
+                        wprintf(L"Halaman tidak boleh melewati halaman maksimum!\n");
+                        page--;
+                        await_enter();
+                    }
+
                     break;
                 case 4:
                     page--;
+                    if (page < 1) {
+                        wprintf(L"Halaman tidak boleh negatif!\n");
+                        page++;
+                        await_enter();
+                    }
+
                     break;
                 case 0:
                     return;

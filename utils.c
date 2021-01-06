@@ -115,16 +115,17 @@ void* safe_alloc(void* mem, size_t num_elems, size_t elem_size) {
     void* tmp = NULL;
 
     // free memory yg ditargetkan jika kosong
-    if (num_elems == 0 && mem != NULL) {
-        free(mem);
-        mem = NULL;
-        return mem;
+    if (num_elems == 0) {
+        if (mem != NULL) {
+            free(mem);
+            mem = NULL;
+        }
+
+        return NULL;
     }
 
-    // jika target memory adalah NULL maka kita inisialisasi alokasikan memory
     if (mem == NULL)
         tmp = malloc(num_elems * elem_size);
-    // dan jika tidak, kita alokasi ulang memory
     else
         tmp = realloc(mem, num_elems * elem_size);
 
@@ -137,7 +138,9 @@ void* safe_alloc(void* mem, size_t num_elems, size_t elem_size) {
             L"       This is most likely caused because there's no memory available!\n",
             mem);
 
-        free(mem);
+        if (mem != NULL)
+            free(mem);
+
         exit(EXIT_FAILURE);
     } else {
         mem = tmp;
@@ -244,6 +247,9 @@ void __handlesort_book(book_t* base, ll low, ll high, cmpfunc_book_t __cmpfunc) 
 }
 
 void quicksort_book(book_t* base, size_t length, cmpfunc_book_t __cmpfunc) {
+    if (base == NULL || length < 1)
+        return;
+
     __handlesort_book(base, 0, length - 1, __cmpfunc);
 }
 

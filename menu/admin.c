@@ -10,7 +10,7 @@ void __add_book() {
 
     int total = 0;
     do {
-        total = scan_number(L"Masukkan jumlah buku yang akan diiputkan [0 untuk kembali]: ");
+        total = scan_number(L"Masukkan jumlah buku yang akan diinputkan [0 untuk kembali]: ");
 
         if (total == 0)
             return;
@@ -101,16 +101,18 @@ void __add_book() {
             break;
         } while (true);
 
-        int idx = findbook_title(title);
-        if (idx != -1) {
-            book_t* found = &BOOK_DB[idx];
+        if (BLENGTH >= 1) {
+            int idx = findbook_title(title);
+            if (idx != -1) {
+                book_t* found = &BOOK_DB[idx];
 
-            if (wcscmp(found->author, author) == 0) {
-                wprintf(L"Buku ini sudah ada di database buku!\n");
-                continue;
+                if (wcscmp(found->author, author) == 0) {
+                    wprintf(L"Buku ini sudah ada di database buku!\n");
+                    continue;
+                }
             }
         }
-
+        
         createbook(++LAST_BOOK_ID, title, author, relyear, pages, L"-", 0L);
         wprintf(L"Buku berhasil ditambahkan!\n");
 
