@@ -482,10 +482,8 @@ void load_users() {
 
         wchar_t tmp[101 + 11];
 
-        fwscanf(file, L"%l[^;];%l[^;];%d;%d;%l[^\n]", name, password, &isadmin, &book_count, tmp);
-        fgetwc(file);
-
-        if (feof(file))
+        int scanres = fwscanf(file, L"%l[^;];%l[^;];%d;%d;%l[^\n]", name, password, &isadmin, &book_count, tmp);
+        if (scanres == EOF || fgetwc(file) == WEOF)
             break;
 
         int idx = 0;
