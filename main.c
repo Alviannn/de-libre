@@ -7,7 +7,7 @@ int main() {
     // digunakan untuk format angka
     // misal: 100000 -> 100,000
     setlocale(LC_NUMERIC, "");
-    
+
     set_utf8_encoding(stdout);
     set_utf8_encoding(stdin);
 

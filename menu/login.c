@@ -144,7 +144,7 @@ void __register_user() {
 
     createuser(username, password, false, NULL, 0);
     save_users();
-    
+
     await_enter();
 }
 
@@ -153,25 +153,25 @@ void __exit_program() {
 
     wchar_t msg[970];
     wcscpy(msg,
-          L"╔════════════════════════════════════════════════╗\n"
-          L"║            ___                                 ║\n"
-          L"║             | |_  _  _ |    \\/ _               ║\n"
-          L"║             | | |(_|| ||<   / (_)|_|           ║\n"
-          L"║                                                ║\n"
-          L"║                                                ║\n"
-          L"║  Terima kasih sudah menggunakan aplikasi ini!  ║\n"
-          L"║                                                ║\n"
-          L"║                  Anggota (4):                  ║\n"
-          L"║   (1) Alexander Yoga Setiawan - 2440076002     ║\n"
-          L"║   (2) Alvian Daru Quthni      - 2440113686     ║\n"
-          L"║   (3) Fadlan Muhammad Bahtiar - 2440113566     ║\n"
-          L"║   (4) Rahmat Syifana Jaelani  - 2440113585     ║\n"
-          L"║                                                ║\n"
-          L"║                    GROUP  3                    ║\n"
-          L"║          TOPIC: Aplikasi Perpustakaan          ║\n"
-          L"║                  KELAS:  LC01                  ║\n"
-          L"║                                                ║\n"
-          L"╚════════════════════════════════════════════════╝\n");
+           L"╔════════════════════════════════════════════════╗\n"
+           L"║            ___                                 ║\n"
+           L"║             | |_  _  _ |    \\/ _               ║\n"
+           L"║             | | |(_|| ||<   / (_)|_|           ║\n"
+           L"║                                                ║\n"
+           L"║                                                ║\n"
+           L"║  Terima kasih sudah menggunakan aplikasi ini!  ║\n"
+           L"║                                                ║\n"
+           L"║                  Anggota (4):                  ║\n"
+           L"║   (1) Alexander Yoga Setiawan - 2440076002     ║\n"
+           L"║   (2) Alvian Daru Quthni      - 2440113686     ║\n"
+           L"║   (3) Fadlan Muhammad Bahtiar - 2440113566     ║\n"
+           L"║   (4) Rahmat Syifana Jaelani  - 2440113585     ║\n"
+           L"║                                                ║\n"
+           L"║                    GROUP  3                    ║\n"
+           L"║          TOPIC: Aplikasi Perpustakaan          ║\n"
+           L"║                  KELAS:  LC01                  ║\n"
+           L"║                                                ║\n"
+           L"╚════════════════════════════════════════════════╝\n");
 
     int count = 0;
     int i = 0, j = 0;
@@ -182,7 +182,7 @@ void __exit_program() {
 
         sleep(50);
     }
-    
+
     wprintf(L"\n");
 
     await_enter();

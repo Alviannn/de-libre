@@ -77,8 +77,8 @@ void __add_book() {
 
         do {
             pages = scan_number(L"Masukkan jumlah halaman buku: ");
-            
-            if (pages== 0)
+
+            if (pages == 0)
                 return;
             if (pages < 0) {
                 wprintf(L"Jumlah halaman buku tidak bisa negatif!\n");
@@ -134,13 +134,20 @@ void __add_book() {
         L"║    isi/halaman buku adalah 1.txt, 2.txt, 3.txt.       ║\n"
         L"║                                                       ║\n"
         L"║   • Penempatan file:                                  ║\n"
-        L"║      "ANSI_YELLOW"DATABASE"ANSI_RESET"                                         ║\n"
-        L"║       "ANSI_YELLOW"└─BOOK_DB"ANSI_RESET"                                       ║\n"
-        L"║         "ANSI_YELLOW"└─12"ANSI_RESET"                                          ║\n"
-        L"║           "ANSI_YELLOW"├─1.txt"ANSI_RESET"                                     ║\n"
-        L"║           "ANSI_YELLOW"├─2.txt"ANSI_RESET"                                     ║\n"
-        L"║           "ANSI_YELLOW"├─3.txt"ANSI_RESET"                                     ║\n"
-        L"║           "ANSI_YELLOW"└─metadata.txt"ANSI_RESET"                              ║\n"
+        L"║      " ANSI_YELLOW "DATABASE" ANSI_RESET
+        "                                         ║\n"
+        L"║       " ANSI_YELLOW "└─BOOK_DB" ANSI_RESET
+        "                                       ║\n"
+        L"║         " ANSI_YELLOW "└─12" ANSI_RESET
+        "                                          ║\n"
+        L"║           " ANSI_YELLOW "├─1.txt" ANSI_RESET
+        "                                     ║\n"
+        L"║           " ANSI_YELLOW "├─2.txt" ANSI_RESET
+        "                                     ║\n"
+        L"║           " ANSI_YELLOW "├─3.txt" ANSI_RESET
+        "                                     ║\n"
+        L"║           " ANSI_YELLOW "└─metadata.txt" ANSI_RESET
+        "                              ║\n"
         L"║                                                       ║\n"
         L"╚═══════════════════════════════════════════════════════╝\n"
         L"\n");

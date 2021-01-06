@@ -116,7 +116,7 @@ void __borrow_books(book_sort name, sort_type type) {
             switch (choice) {
                 case 1:
                     targetid = scan_number(L"Masukkan ID buku [0 untuk kembali]: ");
-                    
+
                     if (targetid == 0)
                         break;
                     if (targetid < 1) {
@@ -211,7 +211,7 @@ void __return_borrowed_books() {
 
         int idx = findbook(id);
         target = &BOOK_DB[idx];
-        
+
         break;
     } while (true);
 
@@ -349,7 +349,7 @@ void __read_book() {
             if (id == 0)
                 return;
             if (id < 1)
-               wprintf(L"ID buku tidak valid!\n");
+                wprintf(L"ID buku tidak valid!\n");
 
             int idx = findbook(id);
             if (idx == -1)
@@ -362,7 +362,6 @@ void __read_book() {
         wprintf(
             L"NOTE: Anda dapat mengisi '0' untuk keluar dari menu ini!\n"
             L"\n");
-
 
         wprintf(L"Masukkan halaman yang ingin dibaca [1-%d]: ", current->pages);
         int page = scan_number(NULL);

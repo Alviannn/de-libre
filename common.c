@@ -258,10 +258,10 @@ void view_book(book_t* book) {
         L"║                     Detail  Buku                     ║\n"
         L"╠══════════════════════════════════════════════════════╣\n"
         L"║                                                      ║\n"
-        L"║ · Judul   : %-40ls ║\n"
-        L"║ · Penulis : %-40ls ║\n"
-        L"║ · Halaman : %-40d ║\n"
-        L"║ · Tersedia: %-40ls ║\n"
+        L"║ • Judul   : %-40ls ║\n"
+        L"║ • Penulis : %-40ls ║\n"
+        L"║ • Halaman : %-40d ║\n"
+        L"║ • Tersedia: %-40ls ║\n"
         L"║                                                      ║\n"
         L"╚══════════════════════════════════════════════════════╝\n",
         book->title,
@@ -342,7 +342,8 @@ bool await_confirmation(wchar_t* message) {
         L"%ls"
         L"\n"
         L"(Y) Ya\n"
-        L"(N) Tidak\n", message);
+        L"(N) Tidak\n",
+        message);
 
     wchar_t answer;
     do {
@@ -390,7 +391,7 @@ void save_books() {
         set_utf8_encoding(curfile);
 
         fwprintf(curfile, L"%d;%ls;%ls;%d;%ls;%lld\n",
-                tmp->id, tmp->title, tmp->author, tmp->pages, tmp->borrower, tmp->duetime);
+                 tmp->id, tmp->title, tmp->author, tmp->pages, tmp->borrower, tmp->duetime);
         fclose(curfile);
     }
 }
@@ -537,7 +538,8 @@ bool readbook(book_t* current, int page) {
         L"\n"
         L"\n"
         L"Halaman: %d/%d\n"
-        L"Tekan 'enter' untuk selesai membaca...\n", page, current->pages);
+        L"Tekan 'enter' untuk selesai membaca...\n",
+        page, current->pages);
 
     getwchar();
     fflush(stdin);
