@@ -77,6 +77,9 @@ void __add_book() {
 
         do {
             relyear = scan_number(L"Masukkan tahun rilis buku: ");
+
+            if (relyear == 0)
+                return;
             if (relyear < 1) {
                 wprintf(L"Tahun rilis buku harus positif!\n");
                 continue;
