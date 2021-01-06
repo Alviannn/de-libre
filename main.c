@@ -38,16 +38,5 @@ int main() {
         }
     }
 
-    save_users();
-    save_books();
-
-    if (USER_DB != NULL)
-        free(USER_DB);
-    if (BOOK_DB != NULL)
-        free(BOOK_DB);
-
-    ULENGTH = 0;
-    BLENGTH = 0;
-
     return 0;
 }

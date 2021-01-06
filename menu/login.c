@@ -151,6 +151,17 @@ void __register_user() {
 void __exit_program() {
     clearscreen();
 
+    save_users();
+    save_books();
+
+    if (USER_DB != NULL)
+        free(USER_DB);
+    if (BOOK_DB != NULL)
+        free(BOOK_DB);
+
+    ULENGTH = 0;
+    BLENGTH = 0;
+
     wchar_t msg[970];
     wcscpy(msg,
            L"╔════════════════════════════════════════════════╗\n"
