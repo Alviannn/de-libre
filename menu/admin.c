@@ -190,7 +190,7 @@ void __remove_book() {
             book_t* tmp = &pack.list[i];
 
             wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-7d │ %-8ls │\n",
-                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? L"No" : L"Yes");
+                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(tmp) ? L"No" : L"Yes");
         }
 
         wprintf(LINE);
@@ -294,7 +294,7 @@ void __view_books() {
             book_t* tmp = &pack.list[i];
 
             wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-7d │ %-8ls │\n",
-                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? L"No" : L"Yes");
+                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(tmp) ? L"No" : L"Yes");
         }
 
         wprintf(LINE);

@@ -26,10 +26,10 @@ int comparebook_asc(const book_t* a, const book_t* b) {
         case PAGES_SORT:
             return a->pages - b->pages;
         case AVAILABILITY_SORT:
-            if (!isbook_borrowed(*a) && !isbook_borrowed(*b))
+            if (!isbook_borrowed(a) && !isbook_borrowed(b))
                 return a->id - b->id;
             else
-                return !isbook_borrowed(*b);
+                return !isbook_borrowed(b);
     }
 
     return a->id - b->id;
@@ -113,7 +113,7 @@ bool removebook(int id) {
     }
 
     book_t* found = &BOOK_DB[idx];
-    if (isbook_borrowed(*found)) {
+    if (isbook_borrowed(found)) {
         wprintf(L"Buku yang sedang dipinjam tidak dapat dihapus!\n");
         return false;
     }
@@ -133,8 +133,46 @@ bool removebook(int id) {
     return true;
 }
 
-bool isbook_borrowed(book_t book) {
-    return wcslen(book.borrower) != 0 && wcscmp(book.borrower, L"-") != 0 && book.duetime != 0;
+bool isbook_borrowed(const book_t* book) {
+    if (book == NULL)
+        return false;
+
+    return wcslen(book->borrower) != 0 && wcscmp(book->borrower, L"-") != 0 && book->duetime != 0;
+}
+
+bool book_hascontent(const book_t* book) {
+    if (book == NULL)
+        return false;
+
+    char path[FILENAME_MAX];
+    sprintf(path, "%s/%d", BOOK_DATABASE_PATH, book->id);
+
+    DIR* dir = opendir(path);
+    if (dir == NULL)
+        return false;
+
+    struct dirent* readd = NULL;
+    char* filename = NULL;
+    int count = 0, tmp = 0;
+
+    while ((readd = readdir(dir)) != NULL) {
+        filename = readd->d_name;
+        count++;
+
+        if (count < 2)
+            continue;
+
+        if (strstr(filename, ".txt") == NULL)
+            continue;
+        if (strstr(filename, "metadata") != NULL)
+            continue;
+
+        int scanres = sscanf(filename, "%d.txt", &tmp);
+        if (scanres != 0)
+            return true;
+    }
+
+    return false;
 }
 
 int finduser(wchar_t name[]) {
@@ -267,7 +305,7 @@ void view_book(book_t* book) {
         book->title,
         book->author,
         book->pages,
-        isbook_borrowed(*book) ? L"No" : L"Yes");
+        isbook_borrowed(book) ? L"No" : L"Yes");
 }
 
 int select_booksort() {
@@ -506,7 +544,7 @@ void load_users() {
 bool readbook(book_t* current, int page) {
     clearscreen();
 
-    if (!isbook_borrowed(*current)) {
+    if (!isbook_borrowed(current)) {
         wprintf(L"Anda sedang tidak meminjam buku ini!\n");
         return false;
     }
@@ -544,6 +582,7 @@ bool readbook(book_t* current, int page) {
 
     getwchar();
     fflush(stdin);
+    
     return true;
 }
 

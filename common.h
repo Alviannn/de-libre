@@ -179,8 +179,18 @@ bool removebook(int id);
 
 /**
  * @brief Menentukan apakah sebuah buku sedang dipinjam atau tidak
+ * 
+ * @param book target pointer buku
  */
-bool isbook_borrowed(book_t book);
+bool isbook_borrowed(const book_t* book);
+
+/**
+ * @brief Menentukan apakah sebuah buku memiliki isi yang dapat dibaca
+ * 
+ * @param book target pointer buku
+ * @return true jika buku memiliki isi, false jika sebaliknya
+ */
+bool book_hascontent(const book_t* book);
 
 /**
  * @brief Mencari sebuah user berdasarkan username (dengan menggunakan metode binary search)

@@ -28,7 +28,7 @@ void __do_borrow(book_t* book) {
 
     view_book(book);
 
-    if (isbook_borrowed(*book)) {
+    if (isbook_borrowed(book)) {
         wprintf(L"Buku ini sedang dipinjam oleh orang lain!\n");
         return;
     }
@@ -86,7 +86,7 @@ void __borrow_books(book_sort name, sort_type type) {
             book_t* tmp = &pack.list[i];
 
             wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-7d │ %-8ls │\n",
-                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(*tmp) ? L"No" : L"Yes");
+                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(tmp) ? L"No" : L"Yes");
         }
 
         wprintf(LINE);
@@ -361,6 +361,12 @@ void __read_book() {
             }
 
             current = &BOOK_DB[idx];
+
+            if (!book_hascontent(current)) {
+                current = NULL;
+                wprintf(L"Buku ini tidak dapat dibaca secara langsung karena tidak memiliki isi!\n");
+                continue;
+            }
         }
 
         clearscreen();
