@@ -55,116 +55,9 @@ void __do_borrow(book_t* book) {
 /**
  * @brief Handles the book borrowing for user 
  */
-void __borrow_books(book_sort name, sort_type type) {
-    int page = 1;
-
-    while (true) {
-        clearscreen();
-
-        wprintf(
-            L"╔════════════════════════════════════════════════╗\n"
-            L"║                 Meminjam  Buku                 ║\n"
-            L"╚════════════════════════════════════════════════╝\n"
-            L"\n");
-
-        bookpaginate_t pack = book_paginate(BOOK_DB, BLENGTH, name, type, page);
-        if (pack.len == 0) {
-            wprintf(L"Data buku tidak dapat ditemukan!\n");
-            await_enter();
-            return;
-        }
-
-        wchar_t LINE[116];
-        wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
-
-        wprintf(LINE);
-        wprintf(L"│ %-3ls │ %-40ls │ %-40ls │ %-7ls │ %-8ls │\n", L"ID", L"Judul", L"Penulis", L"Halaman", L"Tersedia");
-        wprintf(LINE);
-
-        int i = 0;
-        for (i = 0; i < (int)pack.len; i++) {
-            book_t* tmp = &pack.list[i];
-
-            wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-7d │ %-8ls │\n",
-                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(tmp) ? L"No" : L"Yes");
-        }
-
-        wprintf(LINE);
-
-        wprintf(
-            L"Page: %d/%d\n"
-            L"\n"
-            L"1. Pilih buku\n"
-            L"2. Urutkan buku\n"
-            L"3. Halaman selanjutnya\n"
-            L"4. Halaman sebelumnya\n"
-            L"0. Kembali\n",
-            page, pack.maxpage);
-
-        bool isvalid;
-        do {
-            int choice = scan_number(L"Pilihan [0-4] >> ");
-            isvalid = true;
-
-            int targetid = 0;
-
-            int targetidx = -1;
-            book_t* targetbook;
-
-            int tempsort = 0;
-            int temptype = 0;
-
-            switch (choice) {
-                case 1:
-                    targetid = scan_number(L"Masukkan ID buku [0 untuk kembali]: ");
-
-                    if (targetid == 0)
-                        break;
-                    if (targetid < 1) {
-                        wprintf(L"ID buku tidak boleh negatif!\n");
-                        await_enter();
-                        break;
-                    }
-
-                    targetidx = findbook(targetid);
-                    if (targetidx == -1) {
-                        wprintf(L"Tidak dapat menemukan ID buku!\n");
-                        await_enter();
-                        return;
-                    }
-
-                    targetbook = &BOOK_DB[targetidx];
-                    __do_borrow(targetbook);
-
-                    await_enter();
-                    return;
-                case 2:
-                    tempsort = select_booksort();
-                    if (tempsort == -1)
-                        break;
-
-                    temptype = select_sorttype();
-                    if (temptype == -1)
-                        break;
-
-                    name = (book_sort)tempsort;
-                    type = (sort_type)temptype;
-                    break;
-                case 3:
-                    page++;
-                    break;
-                case 4:
-                    page--;
-                    break;
-                case 0:
-                    return;
-                default:
-                    wprintf(L"Pilihan tidak dapat ditemukan!\n");
-                    isvalid = false;
-                    break;
-            }
-        } while (!isvalid);
-    }
+void __borrow_books(book_t* target) {
+    __do_borrow(target);
+    await_enter();
 }
 
 void __return_borrowed_books() {
@@ -410,7 +303,12 @@ void showuser_menu() {
 
         switch (choice) {
             case 1:
-                __borrow_books(ID_SORT, ASCENDING);
+                showbooks(
+                    L"╔════════════════════════════════════════════════╗\n"
+                    L"║                 Meminjam  Buku                 ║\n"
+                    L"╚════════════════════════════════════════════════╝\n"
+                    L"\n",
+                    __borrow_books);
                 break;
             case 2:
                 __return_borrowed_books();

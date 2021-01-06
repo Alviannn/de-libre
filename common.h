@@ -73,6 +73,8 @@ typedef struct book_t {
     wchar_t title[MAXNAME_LENGTH];
     /** penulis buku */
     wchar_t author[MAXNAME_LENGTH];
+    /** tahun rilis buku */
+    int relyear;
     /** jumlah halaman buku */
     int pages;
     /** Username peminjaman buku */
@@ -91,6 +93,8 @@ typedef enum book_sort {
     TITLE_SORT,
     /** Mengurut berdasarkan penulis buku */
     AUTHOR_SORT,
+    /** Mengurut berdasarkan tahun rilis buku */
+    RELYEAR_SORT,
     /** Mengurut berdasarkan jumlah halaman buku */
     PAGES_SORT,
     /** Mengurut berdasarkan status peminjaman buku */
@@ -162,12 +166,13 @@ int createuser(wchar_t name[], wchar_t password[], bool isadmin, int* book_ids, 
  * @param id       ID buku
  * @param title    judul buku
  * @param author   penulis buku
+ * @param relyear  tahun rilis buku
  * @param pages    jumlah halaman buku
  * @param borrower username peminjam buku
  * @param duetime  jatuh tempo peminjaman buku
  * @return index dimana struct buku ini berada
  */
-int createbook(int id, wchar_t title[], wchar_t author[], int pages, wchar_t* borrower, time_t duetime);
+int createbook(int id, wchar_t title[], wchar_t author[], int relyear, int pages, wchar_t* borrower, time_t duetime);
 
 /**
  * @brief Menghapus buku dari database buku berdasarkan ID buku
@@ -292,6 +297,16 @@ bool readbook(book_t* current, int page);
  * @return true jika user ada buku yang dipinjam, false jika tidak ada buku yang dipinjam
  */
 bool show_borrowed_books();
+
+/**
+ * @brief Menampilkan buku-buku yang tersedia dan sudah dihalamankan.
+ *      Pada function ini terdapat pilihan untuk melakukan berbagai macam hal
+ *      terutama untuk mengurutkan buku, memasuki halaman selanjutnya, dan sebagainya.
+ * 
+ * @param header    pesan header sebelum menampilkan pilihan
+ * @param on_select function yang akan dieksekusi pada saat user memilih sebuah buku
+ */
+void showbooks(wchar_t* header, void (*on_select)(book_t* target));
 
 // -                                               - //
 // ---------------------- End ---------------------- //

@@ -23,6 +23,8 @@ int comparebook_asc(const book_t* a, const book_t* b) {
             return wcscmp(a->title, b->title);
         case AUTHOR_SORT:
             return wcscmp(a->author, b->author);
+        case RELYEAR_SORT:
+            return a->relyear - b->relyear;
         case PAGES_SORT:
             return a->pages - b->pages;
         case AVAILABILITY_SORT:
@@ -79,7 +81,7 @@ int createuser(wchar_t name[], wchar_t password[], bool isadmin, int* book_ids, 
     return ULENGTH - 1;
 }
 
-int createbook(int id, wchar_t title[], wchar_t author[], int pages, wchar_t* borrower, time_t duetime) {
+int createbook(int id, wchar_t title[], wchar_t author[], int relyear, int pages, wchar_t* borrower, time_t duetime) {
     book_t book;
 
     wcscpy(book.title, title);
@@ -89,6 +91,7 @@ int createbook(int id, wchar_t title[], wchar_t author[], int pages, wchar_t* bo
         wcscpy(book.borrower, borrower);
 
     book.id = id;
+    book.relyear = relyear;
     book.pages = pages;
     book.duetime = duetime;
 
@@ -291,6 +294,7 @@ bookpaginate_t book_paginate(book_t* arr, int length, book_sort name, sort_type 
 
 void view_book(book_t* book) {
     clearscreen();
+
     wprintf(
         L"╔══════════════════════════════════════════════════════╗\n"
         L"║                     Detail  Buku                     ║\n"
@@ -298,12 +302,13 @@ void view_book(book_t* book) {
         L"║                                                      ║\n"
         L"║ • Judul   : %-40ls ║\n"
         L"║ • Penulis : %-40ls ║\n"
+        L"║ • Tahun   : %-40d ║\n"
         L"║ • Halaman : %-40d ║\n"
         L"║ • Tersedia: %-40ls ║\n"
         L"║                                                      ║\n"
         L"╚══════════════════════════════════════════════════════╝\n",
-        book->title,
-        book->author,
+        book->title, book->author,
+        book->relyear,
         book->pages,
         isbook_borrowed(book) ? L"No" : L"Yes");
 }
@@ -318,8 +323,9 @@ int select_booksort() {
         L"║ [1] Berdasarkan ID buku                        ║\n"
         L"║ [2] Berdasarkan judul buku                     ║\n"
         L"║ [3] Berdasarkan penulis buku                   ║\n"
-        L"║ [4] Berdasarkan jumlah halaman buku            ║\n"
-        L"║ [5] Berdasarkan status peminjaman              ║\n"
+        L"║ [4] Berdasarkan tahun rilis buku               ║\n"
+        L"║ [5] Berdasarkan jumlah halaman buku            ║\n"
+        L"║ [6] Berdasarkan status peminjaman              ║\n"
         L"║ [0] Kembali                                    ║\n"
         L"║                                                ║\n"
         L"╚════════════════════════════════════════════════╝\n"
@@ -330,7 +336,7 @@ int select_booksort() {
         int choice = scan_number(L"Pilihan [0-5] >> ");
         isvalid = true;
 
-        if (choice >= 0 && choice <= 5) {
+        if (choice >= 0 && choice <= 6) {
             return choice - 1;
         } else {
             isvalid = false;
@@ -429,8 +435,11 @@ void save_books() {
         FILE* curfile = fopen(metadata, "w");
         set_utf8_encoding(curfile);
 
-        fwprintf(curfile, L"%d;%ls;%ls;%d;%ls;%lld\n",
-                 tmp->id, tmp->title, tmp->author, tmp->pages, tmp->borrower, tmp->duetime);
+        fwprintf(curfile, L"%d;%ls;%ls;%d;%d;%ls;%lld\n",
+                 tmp->id, tmp->title, tmp->author,
+                 tmp->relyear, tmp->pages,
+                 tmp->borrower, tmp->duetime);
+
         fclose(curfile);
     }
 }
@@ -466,7 +475,7 @@ void load_books() {
 
         sprintf(metadatapath, BOOK_DATABASE_PATH "/%d/metadata.txt", rawid);
 
-        int id, pages;
+        int id, pages, relyear;
         wchar_t title[MAXNAME_LENGTH],
             author[MAXNAME_LENGTH],
             borrower[MAXNAME_LENGTH];
@@ -476,9 +485,11 @@ void load_books() {
         set_utf8_encoding(file);
 
         if (file != NULL) {
-            fwscanf(file, L"%d;%l[^;];%l[^;];%d;%l[^;];%lld", &id, title, author, &pages, borrower, &duetime);
+            fwscanf(file, L"%d;%l[^;];%l[^;];%d;%d;%l[^;];%lld",
+                    &id, title, author, &relyear, &pages, borrower, &duetime);
+
             fclose(file);
-            createbook(id, title, author, pages, borrower, duetime);
+            createbook(id, title, author, relyear, pages, borrower, duetime);
         }
     }
 
@@ -577,20 +588,15 @@ bool readbook(book_t* current, int page) {
         L"\n"
         L"\n"
         L"Halaman: %d/%d\n"
-        L"Tekan 'enter' untuk selesai membaca...\n",
+        L"Tekan 'enter' untuk selesai membaca...",
         page, current->pages);
 
     getwchar();
     fflush(stdin);
-    
+
     return true;
 }
 
-/**
- * @brief Shows the user's borrowed books
- * 
- * @return true if the function successfully executed, false is otherwise
- */
 bool show_borrowed_books() {
     clearscreen();
 
@@ -603,11 +609,11 @@ bool show_borrowed_books() {
     MAIN_BOOK_SORT = ID_SORT;
     quicksort_book(BOOK_DB, BLENGTH, book_comparator(ASCENDING));
 
-    wchar_t LINE[108];
-    wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
+    wchar_t LINE[116];
+    wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
 
     wprintf(LINE);
-    wprintf(L"│ %-3ls │ %-40ls │ %-40ls │ %-10ls │\n", L"ID", L"Judul", L"Penulis", L"Due Date");
+    wprintf(L"│ %-3ls │ %-40ls │ %-40ls │ %-5ls │ %-10ls │\n", L"ID", L"Judul", L"Penulis", L"Tahun", L"Due Date");
     wprintf(LINE);
 
     int i = 0;
@@ -621,9 +627,117 @@ bool show_borrowed_books() {
         swprintf(duedate, 11, L"%02d-%02d-%d", ltm->tm_mday, ltm->tm_mon + 1, ltm->tm_year + 1900);
         wcsftime(duedate, 11, L"%d-%m-%Y", ltm);
 
-        wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-10ls │\n", tmp->id, tmp->title, tmp->author, duedate);
+        wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-5d │ %-10ls │\n",
+                tmp->id, tmp->title, tmp->author, tmp->relyear, duedate);
     }
 
     wprintf(LINE);
     return true;
+}
+
+void showbooks(wchar_t* header, void (*on_select)(book_t* target)) {
+    int page = 1;
+
+    book_sort name = ID_SORT;
+    sort_type type = ASCENDING;
+
+    while (true) {
+        clearscreen();
+
+        if (header != NULL)
+            wprintf(header);
+
+        bookpaginate_t pack = book_paginate(BOOK_DB, BLENGTH, name, type, page);
+        if (pack.len == 0) {
+            wprintf(L"Data buku tidak dapat ditemukan!\n");
+            await_enter();
+            return;
+        }
+
+        wchar_t LINE[124];
+        wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
+
+        wprintf(LINE);
+        wprintf(L"│ %-3ls │ %-40ls │ %-40ls │ %-5ls │ %-7ls │ %-8ls │\n", L"ID", L"Judul", L"Penulis", L"Tahun", L"Halaman", L"Tersedia");
+        wprintf(LINE);
+
+        int i = 0;
+        for (i = 0; i < pack.len; i++) {
+            book_t* tmp = &pack.list[i];
+
+            wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-5d │ %-7d │ %-8ls │\n",
+                    tmp->id, tmp->title, tmp->author,
+                    tmp->relyear, tmp->pages,
+                    isbook_borrowed(tmp) ? L"No" : L"Yes");
+        }
+
+        wprintf(LINE);
+
+        wprintf(
+            L"Page: %d/%d\n"
+            L"\n"
+            L"1. Pilih buku\n"
+            L"2. Urutkan buku\n"
+            L"3. Halaman selanjutnya\n"
+            L"4. Halaman sebelumnya\n"
+            L"0. Kembali\n",
+            page, pack.maxpage);
+
+        bool isvalid;
+        do {
+            int choice = scan_number(L"Pilihan [0-4] >> ");
+            isvalid = true;
+
+            int targetid = 0, targetidx = 0;
+
+            int tempsort = 0;
+            int temptype = 0;
+
+            switch (choice) {
+                case 1:
+                    targetid = scan_number(L"Masukkan ID buku [0 untuk kembali]: ");
+
+                    if (targetid == 0)
+                        break;
+                    if (targetid < 1) {
+                        wprintf(L"ID buku tidak boleh negatif!\n");
+                        await_enter();
+                        break;
+                    }
+
+                    targetidx = findbook(targetid);
+                    if (targetidx == -1) {
+                        wprintf(L"Tidak dapat menemukan ID buku!\n");
+                        break;
+                    }
+
+                    on_select(&BOOK_DB[targetidx]);
+                    return;
+                case 2:
+                    tempsort = select_booksort();
+                    if (tempsort == -1)
+                        break;
+
+                    temptype = select_sorttype();
+                    if (temptype == -1)
+                        break;
+
+                    name = (book_sort)tempsort;
+                    type = (sort_type)temptype;
+                    break;
+                case 3:
+                    page++;
+                    break;
+                case 4:
+                    page--;
+                    break;
+                case 0:
+                    return;
+                default:
+                    wprintf(L"Pilihan tidak dapat ditemukan!\n");
+                    isvalid = false;
+                    break;
+            }
+        } while (!isvalid);
+    }
 }

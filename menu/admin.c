@@ -47,7 +47,7 @@ void __add_book() {
             i + 1);
 
         wchar_t title[MAXNAME_LENGTH], author[MAXNAME_LENGTH];
-        int pages;
+        int pages, relyear;
 
         do {
             scan_string(L"Masukkan judul buku: ", title, MAXNAME_LENGTH);
@@ -69,6 +69,16 @@ void __add_book() {
                 return;
             if (wcslen(author) < 3) {
                 wprintf(L"Minimal panjang penulis buku adalah 3 character!\n");
+                continue;
+            }
+
+            break;
+        } while (true);
+
+        do {
+            relyear = scan_number(L"Masukkan tahun rilis buku: ");
+            if (relyear < 1) {
+                wprintf(L"Tahun rilis buku harus positif!\n");
                 continue;
             }
 
@@ -98,7 +108,7 @@ void __add_book() {
             }
         }
 
-        createbook(++LAST_BOOK_ID, title, author, pages, L"-", 0L);
+        createbook(++LAST_BOOK_ID, title, author, relyear, pages, L"-", 0L);
         wprintf(L"Buku berhasil ditambahkan!\n");
 
         await_enter();
@@ -156,217 +166,16 @@ void __add_book() {
     await_enter();
 }
 
-void __remove_book() {
-    int page = 1;
-
-    book_sort name = ID_SORT;
-    sort_type type = ASCENDING;
-
-    while (true) {
-        clearscreen();
-
-        wprintf(
-            L"╔════════════════════════════════════════════════╗\n"
-            L"║                   Hapus Buku                   ║\n"
-            L"╚════════════════════════════════════════════════╝\n"
-            L"\n");
-
-        bookpaginate_t pack = book_paginate(BOOK_DB, BLENGTH, name, type, page);
-        if (pack.len == 0) {
-            wprintf(L"Data buku tidak dapat ditemukan!\n");
-            await_enter();
-            return;
-        }
-
-        wchar_t LINE[116];
-        wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
-
-        wprintf(LINE);
-        wprintf(L"│ %-3ls │ %-40ls │ %-40ls │ %-7ls │ %-8ls │\n", L"ID", L"Judul", L"Penulis", L"Halaman", L"Tersedia");
-        wprintf(LINE);
-
-        int i = 0;
-        for (i = 0; i < pack.len; i++) {
-            book_t* tmp = &pack.list[i];
-
-            wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-7d │ %-8ls │\n",
-                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(tmp) ? L"No" : L"Yes");
-        }
-
-        wprintf(LINE);
-
-        wprintf(
-            L"Page: %d/%d\n"
-            L"\n"
-            L"1. Pilih buku\n"
-            L"2. Urutkan buku\n"
-            L"3. Halaman selanjutnya\n"
-            L"4. Halaman sebelumnya\n"
-            L"0. Kembali\n",
-            page, pack.maxpage);
-
-        bool isvalid;
-        do {
-            int choice = scan_number(L"Pilihan [0-4] >> ");
-            isvalid = true;
-
-            int targetid = 0;
-            int tempsort = 0;
-            int temptype = 0;
-
-            switch (choice) {
-                case 1:
-                    targetid = scan_number(L"Masukkan ID buku [0 untuk kembali]: ");
-
-                    if (targetid == 0)
-                        break;
-                    if (targetid < 1) {
-                        wprintf(L"ID buku tidak boleh negatif!\n");
-                        await_enter();
-                        break;
-                    }
-
-                    if (await_confirmation(L"Apakah anda yakin ingin menghapus buku ini?\n")) {
-                        removebook(targetid);
-                        await_enter();
-                    }
-                    return;
-                case 2:
-                    tempsort = select_booksort();
-                    if (tempsort == -1)
-                        break;
-
-                    temptype = select_sorttype();
-                    if (temptype == -1)
-                        break;
-
-                    name = (book_sort)tempsort;
-                    type = (sort_type)temptype;
-                    break;
-                case 3:
-                    page++;
-                    break;
-                case 4:
-                    page--;
-                    break;
-                case 0:
-                    return;
-                default:
-                    wprintf(L"Pilihan tidak dapat ditemukan!\n");
-                    isvalid = false;
-                    break;
-            }
-        } while (!isvalid);
+void __remove_book(book_t* target) {
+    if (await_confirmation(L"Apakah anda yakin ingin menghapus buku ini?\n")) {
+        removebook(target->id);
+        await_enter();
     }
 }
 
-void __view_books() {
-    int page = 1;
-
-    book_sort name = ID_SORT;
-    sort_type type = ASCENDING;
-
-    while (true) {
-        clearscreen();
-
-        wprintf(
-            L"╔════════════════════════════════════════════════╗\n"
-            L"║                  Daftar  Buku                  ║\n"
-            L"╚════════════════════════════════════════════════╝\n"
-            L"\n");
-
-        bookpaginate_t pack = book_paginate(BOOK_DB, BLENGTH, name, type, page);
-        if (pack.len == 0) {
-            wprintf(L"Data buku tidak dapat ditemukan!\n");
-            await_enter();
-            return;
-        }
-
-        wchar_t LINE[116];
-        wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
-
-        wprintf(LINE);
-        wprintf(L"│ %-3ls │ %-40ls │ %-40ls │ %-7ls │ %-8ls │\n", L"ID", L"Judul", L"Penulis", L"Halaman", L"Tersedia");
-        wprintf(LINE);
-
-        int i = 0;
-        for (i = 0; i < pack.len; i++) {
-            book_t* tmp = &pack.list[i];
-
-            wprintf(L"│ %-3d │ %-40ls │ %-40ls │ %-7d │ %-8ls │\n",
-                    tmp->id, tmp->title, tmp->author, tmp->pages, isbook_borrowed(tmp) ? L"No" : L"Yes");
-        }
-
-        wprintf(LINE);
-
-        wprintf(
-            L"Page: %d/%d\n"
-            L"\n"
-            L"1. Pilih buku\n"
-            L"2. Urutkan buku\n"
-            L"3. Halaman selanjutnya\n"
-            L"4. Halaman sebelumnya\n"
-            L"0. Kembali\n",
-            page, pack.maxpage);
-
-        bool isvalid;
-        do {
-            int choice = scan_number(L"Pilihan [0-4] >> ");
-            isvalid = true;
-
-            int targetid = 0;
-
-            int targetidx = -1;
-            book_t* targetbook;
-
-            int tempsort = 0;
-            int temptype = 0;
-
-            switch (choice) {
-                case 1:
-                    targetid = scan_number(L"Masukkan ID buku [0 untuk kembali]: ");
-                    if (targetid == 0)
-                        break;
-
-                    targetidx = findbook(targetid);
-                    if (targetidx == -1) {
-                        wprintf(L"Tidak dapat menemukan ID buku!\n");
-                        await_enter();
-                        return;
-                    }
-
-                    targetbook = &BOOK_DB[targetidx];
-
-                    view_book(targetbook);
-                    await_enter();
-                    return;
-                case 2:
-                    tempsort = select_booksort();
-                    if (tempsort == -1)
-                        break;
-
-                    temptype = select_sorttype();
-                    if (temptype == -1)
-                        break;
-
-                    name = (book_sort)tempsort;
-                    type = (sort_type)temptype;
-                    break;
-                case 3:
-                    page++;
-                    break;
-                case 4:
-                    page--;
-                    break;
-                case 0:
-                    return;
-                default:
-                    wprintf(L"Pilihan tidak dapat ditemukan!\n");
-                    isvalid = false;
-                    break;
-            }
-        } while (!isvalid);
-    }
+void __view_books(book_t* target) {
+    view_book(target);
+    await_enter();
 }
 
 void __view_users() {
@@ -422,10 +231,20 @@ void showadmin_menu() {
                 __add_book();
                 break;
             case 2:
-                __remove_book();
+                showbooks(
+                    L"╔════════════════════════════════════════════════╗\n"
+                    L"║                   Hapus Buku                   ║\n"
+                    L"╚════════════════════════════════════════════════╝\n"
+                    L"\n",
+                    __remove_book);
                 break;
             case 3:
-                __view_books();
+                showbooks(
+                    L"╔════════════════════════════════════════════════╗\n"
+                    L"║                  Daftar  Buku                  ║\n"
+                    L"╚════════════════════════════════════════════════╝\n"
+                    L"\n",
+                    __view_books);
                 break;
             case 4:
                 __view_users();
