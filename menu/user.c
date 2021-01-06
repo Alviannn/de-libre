@@ -354,8 +354,10 @@ void __read_book() {
                 wprintf(L"ID buku tidak valid!\n");
 
             int idx = findbook(id);
-            if (idx == -1)
+            if (idx == -1) {
                 wprintf(L"Tidak dapat menemukan buku dengan ID ini!\n");
+                continue;
+            }
 
             current = &BOOK_DB[idx];
         }
