@@ -8,7 +8,10 @@ void __login_user() {
         L"║                   LOGIN NOTE                   ║\n"
         L"╠════════════════════════════════════════════════╣\n"
         L"║                                                ║\n"
-        L"║ · Input '0' untuk membatalkan login dan        ║\n"
+        L"║ • Semua string atau teks pada input memiliki   ║\n"
+        L"║   panjang maksimal 40 character                ║\n"
+        L"║                                                ║\n"
+        L"║ • Input '0' untuk membatalkan login dan        ║\n"
         L"║   kembali ke menu awal.                        ║\n"
         L"║                                                ║\n"
         L"╚════════════════════════════════════════════════╝\n"
@@ -31,7 +34,7 @@ void __login_user() {
         break;
     } while (true);
 
-    user_t* found = &USER_LIST[useridx];
+    user_t* found = &USER_DB[useridx];
     do {
         wprintf(L"Password: ");
         getpass(password, MAXNAME_LENGTH);
@@ -60,13 +63,16 @@ void __register_user() {
         L"║               REGISTRATION  NOTE               ║\n"
         L"╠════════════════════════════════════════════════╣\n"
         L"║                                                ║\n"
-        L"║ · Username tidak diperbolehkan ada spasi,      ║\n"
+        L"║ • Semua string atau teks pada input memiliki   ║\n"
+        L"║   panjang maksimal 40 character                ║\n"
+        L"║                                                ║\n"
+        L"║ • Username tidak diperbolehkan ada spasi,      ║\n"
         L"║   panjang minimalnya adalah 3 character        ║\n"
         L"║                                                ║\n"
-        L"║ · Password harus terdapat angka dan huruf,     ║\n"
+        L"║ • Password harus terdapat angka dan huruf,     ║\n"
         L"║   panjang minimalnya adalah 5 character        ║\n"
         L"║                                                ║\n"
-        L"║ · Input '0' untuk membatalkan registrasi       ║\n"
+        L"║ • Input '0' untuk membatalkan registrasi       ║\n"
         L"║   dan kembali ke menu awal.                    ║\n"
         L"║                                                ║\n"
         L"╚════════════════════════════════════════════════╝\n"
@@ -187,12 +193,12 @@ void showlogin_menu() {
     clearscreen();
 
     wprintf(
-        L"╔═══╗        ╔╗     ╔╗\n"
-        L"╚╗╔╗║        ║║     ║║\n"
-        L" ║║║║╔══╗    ║║   ╔╗║╚═╗╔═╗╔══╗\n"
-        L" ║║║║║╔╗║    ║║ ╔╗╠╣║╔╗║║╔╝║╔╗║\n"
-        L"╔╝╚╝║║║═╣    ║╚═╝║║║║╚╝║║║ ║║═╣\n"
-        L"╚═══╝╚══╝    ╚═══╝╚╝╚══╝╚╝ ╚══╝\n"
+        L"          ╔═══╗        ╔╗     ╔╗\n"
+        L"          ╚╗╔╗║        ║║     ║║\n"
+        L"           ║║║║╔══╗    ║║   ╔╗║╚═╗╔═╗╔══╗\n"
+        L"           ║║║║║╔╗║    ║║ ╔╗╠╣║╔╗║║╔╝║╔╗║\n"
+        L"          ╔╝╚╝║║║═╣    ║╚═╝║║║║╚╝║║║ ║║═╣\n"
+        L"          ╚═══╝╚══╝    ╚═══╝╚╝╚══╝╚╝ ╚══╝\n"
         L"\n");
 
     wprintf(

@@ -6,16 +6,40 @@ void __add_book() {
     wprintf(
         L"╔════════════════════════════════════════════════╗\n"
         L"║                  Tambah  Buku                  ║\n"
-        L"╚════════════════════════════════════════════════╝\n"
-        L"\n");
+        L"╚════════════════════════════════════════════════╝\n");
 
-    int total = scan_number(L"Masukkan jumlah buku yang akan diiputkan [0 untuk kembali]: ");
-    if (total == 0)
-        return;
+    int total = 0;
+    do {
+        total = scan_number(L"Masukkan jumlah buku yang akan diiputkan [0 untuk kembali]: ");
+
+        if (total == 0)
+            return;
+        if (total < 1) {
+            wprintf(L"Jumlah buku tidak boleh negatif!\n");
+            continue;
+        }
+
+        break;
+    } while (true);
 
     int i = 0;
     for (i = 0; i < total; i++) {
         clearscreen();
+
+        wprintf(
+            L"╔════════════════════════════════════════════════╗\n"
+            L"║                     CATATAN                    ║\n"
+            L"╠════════════════════════════════════════════════╣\n"
+            L"║                                                ║\n"
+            L"║ • Semua string atau teks pada input memiliki   ║\n"
+            L"║   panjang maksimal 40 character dan panjang    ║\n"
+            L"║   minimal 3 character.                         ║\n"
+            L"║                                                ║\n"
+            L"║ • Input '0' untuk membatalkan seluruh proses   ║\n"
+            L"║   penambahan buku dan kembali ke user menu.    ║\n"
+            L"║                                                ║\n"
+            L"╚════════════════════════════════════════════════╝\n"
+            L"\n");
 
         wprintf(
             L"Buku ke-%d\n"
@@ -25,12 +49,31 @@ void __add_book() {
         wchar_t title[MAXNAME_LENGTH], author[MAXNAME_LENGTH];
         int pages;
 
-        scan_string(L"Masukkan judul buku: ", title, MAXNAME_LENGTH);
-        if (wcscmp(title, L"0") == 0)
-            return;
-        scan_string(L"Masukkan penulis buku: ", author, MAXNAME_LENGTH);
-        if (wcscmp(author, L"0") == 0)
-            return;
+        do {
+            scan_string(L"Masukkan judul buku: ", title, MAXNAME_LENGTH);
+
+            if (wcscmp(title, L"0") == 0)
+                return;
+            if (wcslen(title) < 3) {
+                wprintf(L"Minimal panjang judul buku adalah 3 character!\n");
+                continue;
+            }
+
+            break;
+        } while (true);
+
+        do {
+            scan_string(L"Masukkan penulis buku: ", author, MAXNAME_LENGTH);
+
+            if (wcscmp(author, L"0") == 0)
+                return;
+            if (wcslen(author) < 3) {
+                wprintf(L"Minimal panjang penulis buku adalah 3 character!\n");
+                continue;
+            }
+
+            break;
+        } while (true);
 
         do {
             pages = scan_number(L"Masukkan jumlah halaman buku: ");
@@ -44,7 +87,7 @@ void __add_book() {
 
         int idx = findbook_title(title);
         if (idx != -1) {
-            book_t* found = &BOOK_LIST[idx];
+            book_t* found = &BOOK_DB[idx];
 
             if (wcscmp(found->author, author) == 0) {
                 wprintf(L"Buku ini sudah ada di database buku!\n");
@@ -61,13 +104,43 @@ void __add_book() {
     clearscreen();
 
     wprintf(
-        L"CATATAN:\n"
-        L"Buku yang telah ditambahkan tidak langsung mendapatkan isi-isi buku tersebut!\n"
-        L"\n"
-        L"Untuk menambahkan isi buku atau halaman buku:\n"
-        L"1. Letakkan file text (.txt) ke dalam folder dengan ID buku yang diinginkan\n"
-        L"2. Nama file text tersebut harus berupa angka untuk merepresentasikan halaman buku.\n"
-        L"3. Selesai!\n");
+        L"╔═══════════════════════════════════════════════════════╗\n"
+        L"║                        CATATAN                        ║\n"
+        L"╠═══════════════════════════════════════════════════════╣\n"
+        L"║                                                       ║\n"
+        L"║  Buku yang telah ditambahkan tidak akan langsung      ║\n"
+        L"║  mendapatkan isi buku.                                ║\n"
+        L"║                                                       ║\n"
+        L"║  Untuk menambahkan isi buku atau halaman buku:        ║\n"
+        L"║  1. Letakkan file text (.txt) ke dalam folder dengan  ║\n"
+        L"║     alamat file `" ANSI_YELLOW "DATABASE/BOOK_DB/(id buku pilihan)" ANSI_RESET
+        "`  ║\n"
+        L"║     dimana program berada.                            ║\n"
+        L"║                                                       ║\n"
+        L"║  2. Berikan nama file text (.txt) tersebut sebuah     ║\n"
+        L"║     angka untuk merepresentasikan halaman untuk buku  ║\n"
+        L"║     tersebut.                                         ║\n"
+        L"║     Contoh: 1.txt, 2.txt, dan 3.txt                   ║\n"
+        L"║                                                       ║\n"
+        L"║  3. Setelah semua langkah diatas diselesaikan         ║\n"
+        L"║    para pengguna akan mulai dapat membaca buku        ║\n"
+        L"║    yang telah dipinjam.                               ║\n"
+        L"║                                                       ║\n"
+        L"║  Contoh penambahan isi buku:                          ║\n"
+        L"║  • ID buku yang ingin diisi adalah 12 dan file        ║\n"
+        L"║    isi/halaman buku adalah 1.txt, 2.txt, 3.txt.       ║\n"
+        L"║                                                       ║\n"
+        L"║   • Penempatan file:                                  ║\n"
+        L"║      "ANSI_YELLOW"DATABASE"ANSI_RESET"                                         ║\n"
+        L"║       "ANSI_YELLOW"└─BOOK_DB"ANSI_RESET"                                       ║\n"
+        L"║         "ANSI_YELLOW"└─12"ANSI_RESET"                                          ║\n"
+        L"║           "ANSI_YELLOW"├─1.txt"ANSI_RESET"                                     ║\n"
+        L"║           "ANSI_YELLOW"├─2.txt"ANSI_RESET"                                     ║\n"
+        L"║           "ANSI_YELLOW"├─3.txt"ANSI_RESET"                                     ║\n"
+        L"║           "ANSI_YELLOW"└─metadata.txt"ANSI_RESET"                              ║\n"
+        L"║                                                       ║\n"
+        L"╚═══════════════════════════════════════════════════════╝\n"
+        L"\n");
 
     save_books();
     await_enter();
@@ -88,7 +161,7 @@ void __remove_book() {
             L"╚════════════════════════════════════════════════╝\n"
             L"\n");
 
-        bookpaginate_t pack = book_paginate(BOOK_LIST, BLENGTH, name, type, page);
+        bookpaginate_t pack = book_paginate(BOOK_DB, BLENGTH, name, type, page);
         if (pack.len == 0) {
             wprintf(L"Data buku tidak dapat ditemukan!\n");
             await_enter();
@@ -133,8 +206,14 @@ void __remove_book() {
             switch (choice) {
                 case 1:
                     targetid = scan_number(L"Masukkan ID buku [0 untuk kembali]: ");
+
                     if (targetid == 0)
                         break;
+                    if (targetid < 1) {
+                        wprintf(L"ID buku tidak boleh negatif!\n");
+                        await_enter();
+                        break;
+                    }
 
                     if (await_confirmation(L"Apakah anda yakin ingin menghapus buku ini?\n")) {
                         removebook(targetid);
@@ -185,7 +264,7 @@ void __view_books() {
             L"╚════════════════════════════════════════════════╝\n"
             L"\n");
 
-        bookpaginate_t pack = book_paginate(BOOK_LIST, BLENGTH, name, type, page);
+        bookpaginate_t pack = book_paginate(BOOK_DB, BLENGTH, name, type, page);
         if (pack.len == 0) {
             wprintf(L"Data buku tidak dapat ditemukan!\n");
             await_enter();
@@ -244,7 +323,7 @@ void __view_books() {
                         return;
                     }
 
-                    targetbook = &BOOK_LIST[targetidx];
+                    targetbook = &BOOK_DB[targetidx];
 
                     view_book(targetbook);
                     await_enter();
@@ -296,7 +375,7 @@ void __view_users() {
 
     size_t i = 0;
     for (i = 0; i < ULENGTH; i++) {
-        user_t* tmp = &USER_LIST[i];
+        user_t* tmp = &USER_DB[i];
         wprintf(L"│ %-3llu │ %-40ls │ %-5ls │\n", i + 1, tmp->name, (tmp->isadmin ? L"Yes" : L"No"));
     }
     wprintf(line);

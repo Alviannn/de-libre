@@ -67,7 +67,7 @@ void __borrow_books(book_sort name, sort_type type) {
             L"╚════════════════════════════════════════════════╝\n"
             L"\n");
 
-        bookpaginate_t pack = book_paginate(BOOK_LIST, BLENGTH, name, type, page);
+        bookpaginate_t pack = book_paginate(BOOK_DB, BLENGTH, name, type, page);
         if (pack.len == 0) {
             wprintf(L"Data buku tidak dapat ditemukan!\n");
             await_enter();
@@ -116,8 +116,14 @@ void __borrow_books(book_sort name, sort_type type) {
             switch (choice) {
                 case 1:
                     targetid = scan_number(L"Masukkan ID buku [0 untuk kembali]: ");
+                    
                     if (targetid == 0)
                         break;
+                    if (targetid < 1) {
+                        wprintf(L"ID buku tidak boleh negatif!\n");
+                        await_enter();
+                        break;
+                    }
 
                     targetidx = findbook(targetid);
                     if (targetidx == -1) {
@@ -126,7 +132,7 @@ void __borrow_books(book_sort name, sort_type type) {
                         return;
                     }
 
-                    targetbook = &BOOK_LIST[targetidx];
+                    targetbook = &BOOK_DB[targetidx];
                     __do_borrow(targetbook);
 
                     await_enter();
@@ -204,7 +210,7 @@ void __return_borrowed_books() {
         }
 
         int idx = findbook(id);
-        target = &BOOK_LIST[idx];
+        target = &BOOK_DB[idx];
         
         break;
     } while (true);
@@ -349,7 +355,7 @@ void __read_book() {
             if (idx == -1)
                 wprintf(L"Tidak dapat menemukan buku dengan ID ini!\n");
 
-            current = &BOOK_LIST[idx];
+            current = &BOOK_DB[idx];
         }
 
         clearscreen();

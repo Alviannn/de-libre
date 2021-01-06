@@ -3,11 +3,6 @@
 #include "menu/login.h"
 #include "menu/user.h"
 
-/**
- * todo:
- *  - Improve admin adding book tutorial
- *  - Fix adding book can have empty values  
- */
 int main() {
     // digunakan untuk format angka
     // misal: 100000 -> 100,000
@@ -16,8 +11,8 @@ int main() {
     set_utf8_encoding(stdout);
     set_utf8_encoding(stdin);
 
-    USER_LIST = malloc(sizeof(user_t));
-    BOOK_LIST = malloc(sizeof(book_t));
+    USER_DB = malloc(sizeof(user_t));
+    BOOK_DB = malloc(sizeof(book_t));
 
     mkdir(DATABASE_PATH);
 
@@ -46,10 +41,10 @@ int main() {
     save_users();
     save_books();
 
-    if (USER_LIST != NULL)
-        free(USER_LIST);
-    if (BOOK_LIST != NULL)
-        free(BOOK_LIST);
+    if (USER_DB != NULL)
+        free(USER_DB);
+    if (BOOK_DB != NULL)
+        free(BOOK_DB);
 
     ULENGTH = 0;
     BLENGTH = 0;

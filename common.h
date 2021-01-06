@@ -17,9 +17,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <wchar.h>
-#include <sys/stat.h>
 
 /** Panjang maksimum string pada program ini */
 #define MAXNAME_LENGTH 41
@@ -45,6 +45,9 @@
 #define UTF8_ENCODING 0x40000
 // Default encoding category
 #define DEFAULT_ENCODING 0x4000
+
+#define ANSI_YELLOW "\e[33m"
+#define ANSI_RESET "\e[0m"
 
 // -                                                   - //
 // ---------------------- Structs ---------------------- //
@@ -123,12 +126,12 @@ extern user_t* CURRENT_USER;
 extern book_sort MAIN_BOOK_SORT;
 
 /** Database user (array user) */
-extern user_t* USER_LIST;
+extern user_t* USER_DB;
 /** Banyak user pada database user */
 extern size_t ULENGTH;
 
 /** Database buku (array buku) */
-extern book_t* BOOK_LIST;
+extern book_t* BOOK_DB;
 /** Banyak buku pada database buku */
 extern size_t BLENGTH;
 

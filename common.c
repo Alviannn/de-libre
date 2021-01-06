@@ -5,10 +5,10 @@ int LAST_BOOK_ID = 0;
 user_t* CURRENT_USER = NULL;
 book_sort MAIN_BOOK_SORT = ID_SORT;
 
-user_t* USER_LIST = NULL;
+user_t* USER_DB = NULL;
 size_t ULENGTH = 0;
 
-book_t* BOOK_LIST = NULL;
+book_t* BOOK_DB = NULL;
 size_t BLENGTH = 0;
 
 // -                                                      - //
@@ -73,8 +73,8 @@ int createuser(wchar_t name[], wchar_t password[], bool isadmin, int* book_ids, 
 
     // menambahkan user ke dalam database buku
     ULENGTH++;
-    USER_LIST = safe_alloc(USER_LIST, ULENGTH, sizeof(user_t));
-    USER_LIST[ULENGTH - 1] = user;
+    USER_DB = safe_alloc(USER_DB, ULENGTH, sizeof(user_t));
+    USER_DB[ULENGTH - 1] = user;
 
     return ULENGTH - 1;
 }
@@ -94,8 +94,8 @@ int createbook(int id, wchar_t title[], wchar_t author[], int pages, wchar_t* bo
 
     // menambahkan buku ke dalam database buku
     BLENGTH++;
-    BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
-    BOOK_LIST[BLENGTH - 1] = book;
+    BOOK_DB = safe_alloc(BOOK_DB, BLENGTH, sizeof(book_t));
+    BOOK_DB[BLENGTH - 1] = book;
 
     return BLENGTH - 1;
 }
@@ -112,7 +112,7 @@ bool removebook(int id) {
         return false;
     }
 
-    book_t* found = &BOOK_LIST[idx];
+    book_t* found = &BOOK_DB[idx];
     if (isbook_borrowed(*found)) {
         wprintf(L"Buku yang sedang dipinjam tidak dapat dihapus!\n");
         return false;
@@ -124,9 +124,9 @@ bool removebook(int id) {
 
     BLENGTH--;
     if ((size_t)idx != BLENGTH)
-        memcpy((BOOK_LIST + idx), (BOOK_LIST + idx + 1), sizeof(book_t) * (BLENGTH - idx));
+        memcpy((BOOK_DB + idx), (BOOK_DB + idx + 1), sizeof(book_t) * (BLENGTH - idx));
 
-    BOOK_LIST = safe_alloc(BOOK_LIST, BLENGTH, sizeof(book_t));
+    BOOK_DB = safe_alloc(BOOK_DB, BLENGTH, sizeof(book_t));
 
     wprintf(L"Buku berhasil dihapuskan dari database!\n");
     save_books();
@@ -142,11 +142,11 @@ int finduser(wchar_t name[]) {
     int right = ULENGTH - 1;
     int mid = 0;
 
-    quicksort_user(USER_LIST, ULENGTH, compareuser);
+    quicksort_user(USER_DB, ULENGTH, compareuser);
 
     do {
         mid = (left + right) / 2;
-        user_t* temp = &USER_LIST[mid];
+        user_t* temp = &USER_DB[mid];
 
         int compare = wcscmp(name, temp->name);
         if (compare == 0)
@@ -165,7 +165,7 @@ int findbook(int id) {
     book_sort before = MAIN_BOOK_SORT;
     MAIN_BOOK_SORT = ID_SORT;
 
-    quicksort_book(BOOK_LIST, BLENGTH, book_comparator(ASCENDING));
+    quicksort_book(BOOK_DB, BLENGTH, book_comparator(ASCENDING));
     MAIN_BOOK_SORT = before;
 
     int left = 0;
@@ -174,7 +174,7 @@ int findbook(int id) {
 
     do {
         mid = (left + right) / 2;
-        book_t* temp = &BOOK_LIST[mid];
+        book_t* temp = &BOOK_DB[mid];
 
         if (id == temp->id)
             return mid;
@@ -192,7 +192,7 @@ int findbook_title(wchar_t title[]) {
     book_sort before = MAIN_BOOK_SORT;
     MAIN_BOOK_SORT = TITLE_SORT;
 
-    quicksort_book(BOOK_LIST, BLENGTH, book_comparator(ASCENDING));
+    quicksort_book(BOOK_DB, BLENGTH, book_comparator(ASCENDING));
     MAIN_BOOK_SORT = before;
 
     int left = 0;
@@ -201,7 +201,7 @@ int findbook_title(wchar_t title[]) {
 
     do {
         mid = (left + right) / 2;
-        book_t* temp = &BOOK_LIST[mid];
+        book_t* temp = &BOOK_DB[mid];
 
         int compare = wcscmp(title, temp->title);
         if (compare == 0)
@@ -240,7 +240,7 @@ bookpaginate_t book_paginate(book_t* arr, int length, book_sort name, sort_type 
 
     // mengurutkan database buku
     MAIN_BOOK_SORT = name;
-    quicksort_book(BOOK_LIST, BLENGTH, book_comparator(type));
+    quicksort_book(BOOK_DB, BLENGTH, book_comparator(type));
 
     // membuat sebuah bookpack sebagai informasi/data dari pembuatan halaman ini
     bookpaginate_t pack;
@@ -370,7 +370,7 @@ void save_books() {
 
     size_t i = 0;
     for (i = 0; i < BLENGTH; i++) {
-        book_t* tmp = &BOOK_LIST[i];
+        book_t* tmp = &BOOK_DB[i];
 
         int buf = FILENAME_MAX + strlen(BOOK_DATABASE_PATH);
 
@@ -451,7 +451,7 @@ void save_users() {
 
     size_t i = 0, j = 0;
     for (i = 0; i < ULENGTH; i++) {
-        user_t* tmp = &USER_LIST[i];
+        user_t* tmp = &USER_DB[i];
 
         wchar_t borrowed[101 + 11];
         wcscpy(borrowed, L"");
@@ -559,7 +559,7 @@ bool show_borrowed_books() {
     }
 
     MAIN_BOOK_SORT = ID_SORT;
-    quicksort_book(BOOK_LIST, BLENGTH, book_comparator(ASCENDING));
+    quicksort_book(BOOK_DB, BLENGTH, book_comparator(ASCENDING));
 
     wchar_t LINE[108];
     wcscpy(LINE, L"──────────────────────────────────────────────────────────────────────────────────────────────────────────\n");
@@ -572,7 +572,7 @@ bool show_borrowed_books() {
     for (i = 0; i < total; i++) {
         int idx = findbook(CURRENT_USER->book_ids[i]);
 
-        book_t* tmp = &BOOK_LIST[idx];
+        book_t* tmp = &BOOK_DB[idx];
         struct tm* ltm = localtime(&tmp->duetime);
 
         wchar_t duedate[11];
