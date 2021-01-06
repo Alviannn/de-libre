@@ -77,6 +77,9 @@ void __add_book() {
 
         do {
             pages = scan_number(L"Masukkan jumlah halaman buku: ");
+            
+            if (pages== 0)
+                return;
             if (pages < 0) {
                 wprintf(L"Jumlah halaman buku tidak bisa negatif!\n");
                 continue;
