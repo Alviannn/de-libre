@@ -421,7 +421,7 @@ void showuser_menu() {
                 break;
             case 0:
                 CURRENT_USER = NULL;
-                break;
+                return;
             default:
                 wprintf(L"Pilihan tidak dapat ditemukan!\n");
                 isvalid = false;

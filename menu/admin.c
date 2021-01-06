@@ -432,7 +432,7 @@ void showadmin_menu() {
                 break;
             case 0:
                 CURRENT_USER = NULL;
-                break;
+                return;
             default:
                 isvalid = false;
                 wprintf(L"Pilihan tidak dapat ditemukan!\n");
