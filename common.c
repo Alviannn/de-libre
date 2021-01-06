@@ -287,9 +287,10 @@ int select_booksort() {
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
 
-    bool isvalid = true;
+    bool isvalid;
     do {
         int choice = scan_number(L"Pilihan [0-5] >> ");
+        isvalid = true;
 
         if (choice >= 0 && choice <= 5) {
             return choice - 1;
@@ -316,10 +317,10 @@ int select_sorttype() {
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
 
-    bool isvalid = true;
-
+    bool isvalid;
     do {
         int choice = scan_number(L"Pilihan [0-2] >> ");
+        isvalid = true;
 
         if (choice >= 0 && choice <= 2) {
             return choice - 1;

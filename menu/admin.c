@@ -205,9 +205,10 @@ void __remove_book() {
             L"0. Kembali\n",
             page, pack.maxpage);
 
-        bool isvalid = true;
+        bool isvalid;
         do {
             int choice = scan_number(L"Pilihan [0-4] >> ");
+            isvalid = true;
 
             int targetid = 0;
             int tempsort = 0;
@@ -308,9 +309,10 @@ void __view_books() {
             L"0. Kembali\n",
             page, pack.maxpage);
 
-        bool isvalid = true;
+        bool isvalid;
         do {
             int choice = scan_number(L"Pilihan [0-4] >> ");
+            isvalid = true;
 
             int targetid = 0;
 
@@ -410,10 +412,11 @@ void showadmin_menu() {
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
 
-    bool isvalid = true;
-
+    bool isvalid;
     do {
         int choice = scan_number(L"Masukkan pilihan anda >> ");
+        isvalid = true;
+
         switch (choice) {
             case 1:
                 __add_book();

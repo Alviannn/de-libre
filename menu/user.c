@@ -101,9 +101,10 @@ void __borrow_books(book_sort name, sort_type type) {
             L"0. Kembali\n",
             page, pack.maxpage);
 
-        bool isvalid = true;
+        bool isvalid;
         do {
             int choice = scan_number(L"Pilihan [0-4] >> ");
+            isvalid = true;
 
             int targetid = 0;
 
@@ -396,10 +397,11 @@ void showuser_menu() {
         L"╚════════════════════════════════════════════════╝\n"
         L"\n");
 
-    bool isvalid = true;
-
+    bool isvalid;
     do {
         int choice = scan_number(L"Pilihan [0-4] >> ");
+        isvalid = true;
+
         switch (choice) {
             case 1:
                 __borrow_books(ID_SORT, ASCENDING);
