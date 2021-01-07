@@ -112,7 +112,7 @@ void __add_book() {
                 }
             }
         }
-        
+
         createbook(++LAST_BOOK_ID, title, author, relyear, pages, L"-", 0L);
         wprintf(L"Buku berhasil ditambahkan!\n");
 

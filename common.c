@@ -133,7 +133,7 @@ bool removebook(int id) {
 
     wprintf(L"Buku berhasil dihapuskan dari database!\n");
     save_books();
-    
+
     return true;
 }
 
