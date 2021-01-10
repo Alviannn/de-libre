@@ -1,4 +1,6 @@
-# SRC = $(wildcard *.c) $(wildcard */*.c)
+# Untuk pengguna Visual Studio Code (VSCode)
+# dipersilahkan untuk menggunakan ini
+
 NAME = de-libre
 SRC = common.c utils.c menu/login.c menu/user.c menu/admin.c main.c
 
